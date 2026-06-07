@@ -458,7 +458,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
         <span id="chainInfoText">Solana mainnet · Paste any SOL wallet address</span>
       </div>
       <div class="input-group">
-        <input class="wallet-input" id="walletInput" type="text" placeholder="Enter wallet address..." id="walletInputField" onkeydown="if(event.key==='Enter')runAnalysis()" oninput="validateInput(this)" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off"/>
+        <input class="wallet-input" id="walletInput" type="text" placeholder="Enter wallet address..." id="walletInput" onkeydown="if(event.key==='Enter')runAnalysis()" oninput="validateInput(this)" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off"/>
         <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">Analyze →</button>
       </div>
       <div class="input-hint">No wallet? <span onclick="loadDemo()">Load a sample wallet</span> to see a live report. &nbsp;·&nbsp; Press Enter to analyze.</div>
