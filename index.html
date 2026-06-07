@@ -485,7 +485,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
           <div class="wallet-header-left">
             <div class="wallet-avatar" id="walletAvatar">??</div>
             <div class="wallet-header-info">
-              <div class="wallet-header-name" id="walletName">—</div>
+              <div class="wallet-header-name" id="walletName">— <span id="copyAddrBtn" class="copy-addr" onclick="copyAddress(document.getElementById('walletInput').value.trim())" style="display:none;">Copy</span></div>
               <div class="wallet-header-addr" id="walletAddr">—</div>
             </div>
           </div>
@@ -581,7 +581,33 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
           </div>
 
           <!-- Intelligence cards -->
-          <div class="intel-grid" id="intelGrid" style="display:none;"></div>
+          <div class="intel-grid" id="intelGrid" style="display:none;">
+            <div class="intel-card blue">
+              <div class="intel-label">Copy Pattern Signal <span class="tooltip-trigger" onclick="toggleTooltip('ctTooltip')">?</span></div>
+              <div class="tooltip-box" id="ctTooltip">Based on timing uniformity of last 100 transactions. Uniform gaps suggest copying another wallet. ~65% accurate — use as a signal, not a guarantee.</div>
+              <div class="intel-value" id="copyTraderVal">—</div>
+              <div class="intel-sub" id="copyTraderSub">Analyzing trade patterns...</div>
+              <div class="intel-pill" id="copyTraderPill">—</div>
+            </div>
+            <div class="intel-card amber">
+              <div class="intel-label">Avg Hold Time</div>
+              <div class="intel-value" id="holdTimeVal">—</div>
+              <div class="intel-sub" id="holdTimeSub">How long before they sell</div>
+              <div class="intel-pill" id="holdTimePill">—</div>
+            </div>
+            <div class="intel-card green">
+              <div class="intel-label">Recency Score</div>
+              <div class="intel-value" id="recencyVal">—</div>
+              <div class="intel-sub" id="recencySub">How active in last 7 days</div>
+              <div class="intel-pill" id="recencyPill">—</div>
+            </div>
+            <div class="intel-card purple">
+              <div class="intel-label">Trader Style</div>
+              <div class="intel-value" id="styleVal">—</div>
+              <div class="intel-sub" id="styleSub">Based on hold time & volume</div>
+              <div class="intel-pill" id="stylePill">—</div>
+            </div>
+          </div>
         </div>
 
         <!-- TAB: ANALYTICS -->
@@ -1493,12 +1519,9 @@ function resetAnalyzer(){
   document.getElementById('walletInput').value='';
   document.getElementById('analyzeBtn').disabled=false;
   document.getElementById('chartBox').style.display='none';
-  document.getElementById('tradesBox').style.display='none';
   document.getElementById('intelGrid').style.display='none';
   document.getElementById('sentimentBox').style.display='none';
   document.getElementById('extLinks').style.display='none';
-  document.getElementById('chartBox').style.display='none';
-  document.getElementById('intelGrid').style.display='none';
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
   rawSigs=[];
   ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id=>{
@@ -1739,12 +1762,9 @@ async function runAnalysis(){
 
   // Clear previous results
   document.getElementById('chartBox').style.display='none';
-  document.getElementById('tradesBox').style.display='none';
   document.getElementById('intelGrid').style.display='none';
   document.getElementById('sentimentBox').style.display='none';
   document.getElementById('extLinks').style.display='none';
-  document.getElementById('chartBox').style.display='none';
-  document.getElementById('intelGrid').style.display='none';
   document.getElementById('results').classList.remove('show');
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
   rawSigs=[];chartData={'1d':null,'7d':null,'30d':null};
