@@ -222,6 +222,53 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3r
 footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bottom:0.25rem;}
 .fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.55s,transform 0.55s;}
 .fade-in.visible{opacity:1;transform:translateY(0);}
+/* WALLET HEADER CARD */
+.wallet-header-card{background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
+.wallet-header-left{display:flex;align-items:center;gap:12px;}
+.wallet-avatar{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#4f8eff,#a78bfa);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0;}
+.wallet-header-info{}
+.wallet-header-name{font-size:1rem;font-weight:700;letter-spacing:-0.01em;margin-bottom:2px;}
+.wallet-header-addr{font-family:var(--mono);font-size:0.68rem;color:var(--muted);}
+.wallet-header-center{text-align:center;}
+.wallet-value-label{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+.wallet-value-num{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;}
+.wallet-value-sub{font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin-top:2px;}
+.wallet-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.live-badge-inline{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:0.65rem;color:var(--green);}
+
+/* RESULT TABS */
+.result-tabs{display:flex;gap:2px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:1rem;}
+.result-tab{flex:1;padding:7px 12px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-family:var(--mono);font-size:0.72rem;cursor:pointer;transition:all 0.15s;font-weight:500;}
+.result-tab:hover{color:var(--text);}
+.result-tab.active{background:var(--bg4);color:var(--text);border:1px solid var(--border2);}
+.result-tab-content{}
+
+/* OVERVIEW GRID */
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:1rem;}
+.overview-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.1rem;}
+.overview-card-title{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.875rem;}
+.overview-score-row{display:flex;align-items:center;gap:1rem;}
+.overview-score-info{}
+.overview-score-label{font-family:var(--mono);font-size:0.68rem;color:var(--muted2);}
+
+/* WIN RATE */
+.win-rate-big{font-size:2.25rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:8px;font-family:var(--mono);}
+.win-rate-bar-track{height:6px;background:var(--bg4);border-radius:3px;margin-bottom:6px;overflow:hidden;}
+.win-rate-bar-fill{height:100%;border-radius:3px;background:var(--green);transition:width 0.6s ease;}
+.win-rate-sub{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);}
+
+/* PNL GRID */
+.pnl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.pnl-item{}
+.pnl-label{font-family:var(--mono);font-size:0.62rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
+.pnl-val{font-family:var(--mono);font-size:0.9rem;font-weight:500;color:var(--text);}
+
+/* RISK SIGNALS */
+.risk-rows{display:flex;flex-direction:column;gap:6px;}
+.risk-row{display:flex;align-items:center;justify-content:space-between;}
+.risk-row-label{font-family:var(--mono);font-size:0.7rem;color:var(--muted);}
+.risk-row-val{font-family:var(--mono);font-size:0.7rem;font-weight:500;}
+
 .ext-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);}
 .ext-link-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:var(--mono);font-size:0.68rem;cursor:pointer;text-decoration:none;transition:all 0.15s;white-space:nowrap;}
 .ext-link-btn:hover{border-color:var(--border3);color:var(--text);background:var(--bg3);}
@@ -431,162 +478,195 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
       </div>
 
       <div class="results" id="results">
-        <div class="live-badge">● LIVE ON-CHAIN DATA — <span id="txCountBadge">0</span> transactions analyzed</div>
 
-        <div class="score-header">
-          <div class="score-left">
-            <div class="score-ring">
-              <svg width="68" height="68" viewBox="0 0 68 68">
-                <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>
-                <circle id="scoreArc" cx="34" cy="34" r="28" fill="none" stroke="#4f8eff" stroke-width="5" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9"/>
-              </svg>
-              <div class="score-ring-num">
-                <span class="score-big" id="scoreDisplay">—</span>
-                <span class="score-slash">/100</span>
+        <!-- WALLET HEADER -->
+        <div class="wallet-header-card">
+          <div class="wallet-header-left">
+            <div class="wallet-avatar" id="walletAvatar">??</div>
+            <div class="wallet-header-info">
+              <div class="wallet-header-name" id="walletName">—</div>
+              <div class="wallet-header-addr" id="walletAddr">—</div>
+            </div>
+          </div>
+          <div class="wallet-header-center">
+            <div class="wallet-value-label">Wallet Balance</div>
+            <div class="wallet-value-num" id="walletBalance">—</div>
+            <div class="wallet-value-sub" id="walletBalanceSub">—</div>
+          </div>
+          <div class="wallet-header-right">
+            <div class="live-badge-inline">
+              <div class="live-dot"></div>
+              <span id="txCountBadge">0</span> txns analyzed
+            </div>
+            <div class="verdict-pill" id="verdictPill">—</div>
+          </div>
+        </div>
+
+        <!-- TAB NAV -->
+        <div class="result-tabs">
+          <button class="result-tab active" onclick="switchResultTab(this,'tabOverview')">Overview</button>
+          <button class="result-tab" onclick="switchResultTab(this,'tabAnalytics')">Analytics</button>
+          <button class="result-tab" onclick="switchResultTab(this,'tabTrades')">Trade History</button>
+          <button class="result-tab" onclick="switchResultTab(this,'tabBot')">Bot Config</button>
+        </div>
+
+        <!-- TAB: OVERVIEW -->
+        <div class="result-tab-content" id="tabOverview">
+          <div class="overview-grid">
+
+            <!-- Score + Verdict -->
+            <div class="overview-card">
+              <div class="overview-card-title">Intelligence Score</div>
+              <div class="overview-score-row">
+                <div class="score-ring">
+                  <svg width="80" height="80" viewBox="0 0 80 80">
+                    <circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+                    <circle id="scoreArc" cx="40" cy="40" r="33" fill="none" stroke="#4f8eff" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="207.3"/>
+                  </svg>
+                  <div class="score-ring-num">
+                    <span class="score-big" id="scoreDisplay">—</span>
+                    <span class="score-slash">/100</span>
+                  </div>
+                </div>
+                <div class="overview-score-info">
+                  <div class="overview-score-label">Copy Trading Signal</div>
+                  <div id="overviewVerdict" style="font-size:0.85rem;font-weight:600;margin-top:4px;">—</div>
+                  <div id="overviewVerdictSub" style="font-family:var(--mono);font-size:0.68rem;color:var(--muted);margin-top:4px;line-height:1.5;">—</div>
+                </div>
               </div>
             </div>
-            <div class="score-meta">
-              <h3 id="walletName">— <span id="copyAddrBtn" class="copy-addr" onclick="copyAddress(document.getElementById('walletInput').value.trim())">Copy</span></h3>
-              <p id="walletAddr">—</p>
+
+            <!-- Key Metrics -->
+            <div class="overview-card">
+              <div class="overview-card-title">Win Rate</div>
+              <div class="win-rate-big" id="overviewWinRate">—</div>
+              <div class="win-rate-bar-track">
+                <div class="win-rate-bar-fill" id="winRateFill" style="width:0%"></div>
+              </div>
+              <div class="win-rate-sub" id="overviewWinRateSub">— successful / — total</div>
+            </div>
+
+            <!-- PnL Summary -->
+            <div class="overview-card">
+              <div class="overview-card-title">PnL Summary</div>
+              <div class="pnl-grid">
+                <div class="pnl-item"><div class="pnl-label">Total PnL</div><div class="pnl-val" id="ovPnlTotal">—</div></div>
+                <div class="pnl-item"><div class="pnl-label">Best Trade</div><div class="pnl-val c-green" id="ovPnlBest">—</div></div>
+                <div class="pnl-item"><div class="pnl-label">Worst Trade</div><div class="pnl-val c-red" id="ovPnlWorst">—</div></div>
+                <div class="pnl-item"><div class="pnl-label">Avg/Trade</div><div class="pnl-val" id="ovPnlAvg">—</div></div>
+              </div>
+            </div>
+
+            <!-- Suspicious Actions -->
+            <div class="overview-card">
+              <div class="overview-card-title">Risk Signals</div>
+              <div class="risk-rows" id="riskRows"></div>
+            </div>
+
+          </div>
+
+          <!-- Metrics strip -->
+          <div class="metrics-grid" id="metricsGrid"></div>
+
+          <!-- Sentiment -->
+          <div class="sentiment-bar-wrap" id="sentimentBox" style="display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+              <div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#a78bfa;display:inline-block;"></span>Wallet Sentiment</div>
+              <div style="font-family:var(--mono);font-size:0.75rem;font-weight:500;" id="sentimentLabel">—</div>
+            </div>
+            <div class="sentiment-bar-track"><div class="sentiment-bar-fill" id="sentimentFill" style="width:50%;background:var(--amber);"></div></div>
+            <div class="sentiment-labels"><span>Fear / Taking Profits</span><span>Greed / Buying Mode</span></div>
+            <div style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin-top:0.5rem;" id="sentimentDesc">—</div>
+          </div>
+
+          <!-- Intelligence cards -->
+          <div class="intel-grid" id="intelGrid" style="display:none;"></div>
+        </div>
+
+        <!-- TAB: ANALYTICS -->
+        <div class="result-tab-content" id="tabAnalytics" style="display:none;">
+          <!-- Bot Speed -->
+          <div class="speed-compat" id="speedCompatBox" style="display:block;">
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:0.25rem;"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>Bot Speed Compatibility</div>
+            <div style="font-family:var(--mono);font-size:0.68rem;color:var(--muted2);margin-bottom:0.875rem;" id="speedWarning">—</div>
+            <div class="speed-bars" id="speedBars"></div>
+          </div>
+
+          <!-- Activity Chart -->
+          <div class="chart-box" id="chartBox" style="display:none;">
+            <div class="chart-header">
+              <div class="chart-title">Wallet Activity</div>
+              <div class="chart-tabs">
+                <button class="chart-tab active" onclick="switchChart(this,'1d')">1D</button>
+                <button class="chart-tab" onclick="switchChart(this,'7d')">7D</button>
+                <button class="chart-tab" onclick="switchChart(this,'30d')">30D</button>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap"><canvas id="activityChart"></canvas></div>
+            <div class="chart-stats">
+              <div class="chart-stat"><div class="chart-stat-label">Peak</div><div class="chart-stat-val" id="chartPeak">—</div></div>
+              <div class="chart-stat"><div class="chart-stat-label">Avg/Day</div><div class="chart-stat-val" id="chartAvg">—</div></div>
+              <div class="chart-stat"><div class="chart-stat-label">Total</div><div class="chart-stat-val" id="chartTotal">—</div></div>
+              <div class="chart-stat"><div class="chart-stat-label">Trend</div><div class="chart-stat-val" id="chartTrend">—</div></div>
             </div>
           </div>
-          <div class="verdict-pill" id="verdictPill">—</div>
+
+          <!-- AI Report -->
+          <div class="ai-block">
+            <div class="ai-badge">◆ AI INTELLIGENCE REPORT</div>
+            <div class="ai-body" id="aiBody">—</div>
+          </div>
         </div>
 
-        <div class="metrics-grid" id="metricsGrid"></div>
-
-
-        <div class="intel-grid" id="intelGrid" style="display:none;">
-          <div class="intel-card blue">
-            <div class="intel-label">Copy Pattern Signal <span class="tooltip-trigger" onclick="toggleTooltip('ctTooltip')">?</span></div>
-            <div class="tooltip-box" id="ctTooltip">Based on timing uniformity of last 100 transactions. Uniform gaps suggest copying another wallet. Organic traders show irregular timing. ~65% accurate — use as a signal, not a guarantee.</div>
-            <div class="intel-value" id="copyTraderVal">—</div>
-            <div class="intel-sub" id="copyTraderSub">Analyzing trade patterns...</div>
-            <div class="intel-pill" id="copyTraderPill">—</div>
-          </div>
-          <div class="intel-card amber">
-            <div class="intel-label">Avg Hold Time</div>
-            <div class="intel-value" id="holdTimeVal">—</div>
-            <div class="intel-sub" id="holdTimeSub">How long before they sell</div>
-            <div class="intel-pill" id="holdTimePill">—</div>
-          </div>
-          <div class="intel-card green">
-            <div class="intel-label">Recency Score</div>
-            <div class="intel-value" id="recencyVal">—</div>
-            <div class="intel-sub" id="recencySub">How active in last 7 days</div>
-            <div class="intel-pill" id="recencyPill">—</div>
-          </div>
-          <div class="intel-card purple">
-            <div class="intel-label">Trader Style</div>
-            <div class="intel-value" id="styleVal">—</div>
-            <div class="intel-sub" id="styleSub">Based on hold time & volume</div>
-            <div class="intel-pill" id="stylePill">—</div>
-          </div>
-        </div>
-        <div class="chart-box" id="chartBox" style="display:none;">
-          <div class="chart-header">
-            <div class="chart-title">Wallet Activity</div>
-            <div class="chart-tabs">
-              <button class="chart-tab active" onclick="switchChart(this,'1d')">1D</button>
-              <button class="chart-tab" onclick="switchChart(this,'7d')">7D</button>
-              <button class="chart-tab" onclick="switchChart(this,'30d')">30D</button>
+        <!-- TAB: TRADE HISTORY -->
+        <div class="result-tab-content" id="tabTrades" style="display:none;">
+          <div class="trades-box" id="tradesBox">
+            <div class="trades-header"><div class="trades-title">Recent Trade History & PnL</div></div>
+            <table class="trades-table">
+              <thead>
+                <tr>
+                  <th>Time</th><th>Type</th><th>Token</th><th>Amount</th><th>PnL</th><th>Status</th><th>Flag</th>
+                </tr>
+              </thead>
+              <tbody id="tradesBody"></tbody>
+            </table>
+            <div class="trades-summary">
+              <div class="ts-item"><div class="ts-label">Total PnL</div><div class="ts-val" id="totalPnl">—</div></div>
+              <div class="ts-item"><div class="ts-label">Win Rate</div><div class="ts-val" id="tradeWinRate">—</div></div>
+              <div class="ts-item"><div class="ts-label">Best Trade</div><div class="ts-val c-green" id="bestTrade">—</div></div>
+              <div class="ts-item"><div class="ts-label">Worst Trade</div><div class="ts-val c-red" id="worstTrade">—</div></div>
             </div>
           </div>
-          <div class="chart-canvas-wrap"><canvas id="activityChart"></canvas></div>
-          <div class="chart-stats">
-            <div class="chart-stat"><div class="chart-stat-label">Peak</div><div class="chart-stat-val" id="chartPeak">—</div></div>
-            <div class="chart-stat"><div class="chart-stat-label">Avg/Day</div><div class="chart-stat-val" id="chartAvg">—</div></div>
-            <div class="chart-stat"><div class="chart-stat-label">Total</div><div class="chart-stat-val" id="chartTotal">—</div></div>
-            <div class="chart-stat"><div class="chart-stat-label">Trend</div><div class="chart-stat-val" id="chartTrend">—</div></div>
+        </div>
+
+        <!-- TAB: BOT CONFIG -->
+        <div class="result-tab-content" id="tabBot" style="display:none;">
+          <div class="bot-config">
+            <div class="config-header">
+              <div class="config-title">Recommended Banana Gun Config</div>
+              <div class="config-tag" id="configChainTag">Banana Gun · Solana</div>
+            </div>
+            <div class="config-grid" id="configGrid"></div>
           </div>
         </div>
 
-        <div class="trades-box" id="tradesBox" style="display:none;">
-          <div class="trades-header">
-            <div class="trades-title">Recent Trade History & PnL</div>
-          </div>
-          <table class="trades-table">
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Type</th>
-                <th>Token</th>
-                <th>Amount</th>
-                <th>PnL</th>
-                <th>Status</th>
-                <th>Flag</th>
-              </tr>
-            </thead>
-            <tbody id="tradesBody"></tbody>
-          </table>
-          <div class="trades-summary">
-            <div class="ts-item"><div class="ts-label">Total PnL</div><div class="ts-val" id="totalPnl">—</div></div>
-            <div class="ts-item"><div class="ts-label">Win Rate</div><div class="ts-val" id="tradeWinRate">—</div></div>
-            <div class="ts-item"><div class="ts-label">Best Trade</div><div class="ts-val c-green" id="bestTrade">—</div></div>
-            <div class="ts-item"><div class="ts-label">Worst Trade</div><div class="ts-val c-red" id="worstTrade">—</div></div>
-          </div>
-        </div>
-
-        <!-- WALLET SENTIMENT -->
-        <div class="sentiment-bar-wrap" id="sentimentBox" style="display:none;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#a78bfa;display:inline-block;"></span>Wallet Sentiment</div>
-            <div style="font-family:var(--mono);font-size:0.75rem;font-weight:500;" id="sentimentLabel">—</div>
-          </div>
-          <div class="sentiment-bar-track">
-            <div class="sentiment-bar-fill" id="sentimentFill" style="width:50%;background:var(--amber);"></div>
-          </div>
-          <div class="sentiment-labels"><span>Fear / Taking Profits</span><span>Greed / Buying Mode</span></div>
-          <div style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin-top:0.5rem;" id="sentimentDesc">—</div>
-        </div>
-
-        <!-- BOT SPEED COMPATIBILITY -->
-        <div class="speed-compat" id="speedCompatBox" style="display:none;">
-          <div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:0.25rem;"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>Bot Speed Compatibility</div>
-          <div style="font-family:var(--mono);font-size:0.68rem;color:var(--muted2);margin-bottom:0.875rem;" id="speedWarning">—</div>
-          <div class="speed-bars" id="speedBars"></div>
-        </div>
-
-        <div class="bot-config">
-          <div class="config-header">
-            <div class="config-title">Recommended Bot Configuration</div>
-            <div class="config-tag">Banana Gun</div>
-          </div>
-          <div class="config-grid" id="configGrid"></div>
-        </div>
-
-        <div class="ai-block">
-          <div class="ai-badge">◆ AI INTELLIGENCE REPORT</div>
-          <div class="ai-body" id="aiBody">—</div>
-        </div>
-
+        <!-- External links + footer -->
         <div class="ext-links" id="extLinks" style="display:none;">
           <span class="ext-links-label">View on</span>
-          <a class="ext-link-btn" id="extGMGN" href="#" target="_blank" rel="noopener">
-            <div class="ext-dot" style="background:#00ff88;"></div>GMGN
-          </a>
-          <a class="ext-link-btn" id="extSolscan" href="#" target="_blank" rel="noopener">
-            <div class="ext-dot" style="background:#9945ff;"></div>Solscan
-          </a>
-          <a class="ext-link-btn" id="extBirdeye" href="#" target="_blank" rel="noopener">
-            <div class="ext-dot" style="background:#f0a500;"></div>Birdeye
-          </a>
-          <a class="ext-link-btn" id="extPumpFun" href="#" target="_blank" rel="noopener">
-            <div class="ext-dot" style="background:#ff4d6a;"></div>Pump.fun
-          </a>
-          <a class="ext-link-btn" id="extDexscreener" href="#" target="_blank" rel="noopener">
-            <div class="ext-dot" style="background:#4f8eff;"></div>Dexscreener
-          </a>
-          <a class="ext-link-btn" id="extCielo" href="#" target="_blank" rel="noopener">
-            <div class="ext-dot" style="background:#a78bfa;"></div>Cielo
-          </a>
+          <a class="ext-link-btn" id="extGMGN" href="#" target="_blank" rel="noopener"><div class="ext-dot" style="background:#00ff88;"></div>GMGN</a>
+          <a class="ext-link-btn" id="extSolscan" href="#" target="_blank" rel="noopener"><div class="ext-dot" style="background:#9945ff;"></div>Solscan</a>
+          <a class="ext-link-btn" id="extBirdeye" href="#" target="_blank" rel="noopener"><div class="ext-dot" style="background:#f0a500;"></div>Birdeye</a>
+          <a class="ext-link-btn" id="extPumpFun" href="#" target="_blank" rel="noopener"><div class="ext-dot" style="background:#ff4d6a;"></div>Pump.fun</a>
+          <a class="ext-link-btn" id="extDexscreener" href="#" target="_blank" rel="noopener"><div class="ext-dot" style="background:#4f8eff;"></div>Dexscreener</a>
+          <a class="ext-link-btn" id="extCielo" href="#" target="_blank" rel="noopener"><div class="ext-dot" style="background:#a78bfa;"></div>Cielo</a>
         </div>
 
         <div class="result-footer">
           <span class="result-ts" id="resultTs">—</span>
           <button class="btn-reset" onclick="resetAnalyzer()">← New Analysis</button>
         </div>
-      </div>
+
+      </div>      </div>
     </div>
   </div>
 </section>
@@ -1235,6 +1315,13 @@ function resetTokenScan() {
   document.getElementById('tokenScanBtn').disabled = false;
 }
 
+
+function switchResultTab(btn, tabId) {
+  document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.result-tab-content').forEach(t => t.style.display = 'none');
+  document.getElementById(tabId).style.display = 'block';
+}
 buildLeaderboard();
 }
 
@@ -1408,8 +1495,9 @@ function resetAnalyzer(){
   document.getElementById('tradesBox').style.display='none';
   document.getElementById('intelGrid').style.display='none';
   document.getElementById('sentimentBox').style.display='none';
-  document.getElementById('speedCompatBox').style.display='none';
   document.getElementById('extLinks').style.display='none';
+  document.getElementById('chartBox').style.display='none';
+  document.getElementById('intelGrid').style.display='none';
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
   rawSigs=[];
   ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id=>{
@@ -1653,8 +1741,9 @@ async function runAnalysis(){
   document.getElementById('tradesBox').style.display='none';
   document.getElementById('intelGrid').style.display='none';
   document.getElementById('sentimentBox').style.display='none';
-  document.getElementById('speedCompatBox').style.display='none';
   document.getElementById('extLinks').style.display='none';
+  document.getElementById('chartBox').style.display='none';
+  document.getElementById('intelGrid').style.display='none';
   document.getElementById('results').classList.remove('show');
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
   rawSigs=[];chartData={'1d':null,'7d':null,'30d':null};
@@ -1703,7 +1792,7 @@ async function generateAIReport(wallet,onChain){
   const prompt=`You are WalletLens, a professional on-chain intelligence platform for Solana, Ethereum, and Base. Analyze this ${CHAINS[activeChain].name} wallet: ${wallet}
 ${ctx}
 Respond ONLY with valid JSON, no markdown:
-{"score":${onChain?onChain.score:'<0-100>'},"scoreColor":"${onChain?(onChain.score>=70?'#00d68f':onChain.score>=50?'#ffb547':'#ff4d6a'):'#ffb547'}","verdict":"${onChain?(onChain.score>=72?'COPY NOW':onChain.score>=52?'WATCH':'SKIP'):'WATCH'}","verdictClass":"${onChain?(onChain.score>=72?'v-copy':onChain.score>=52?'v-watch':'v-skip'):'v-watch'}","metrics":[{"label":"WIN RATE","value":"${onChain?onChain.winRate+'%':'XX%'}","color":"${onChain?(onChain.winRate>=65?'c-green':onChain.winRate>=50?'c-amber':'c-red'):'c-amber'}"},{"label":"TOTAL TRADES","value":"${onChain?onChain.totalTxns:'XX'}","color":"c-white"},{"label":"SUCCESS RATE","value":"${onChain?onChain.winRate+'%':'XX%'}","color":"${onChain?(onChain.winRate>=65?'c-green':onChain.winRate>=50?'c-amber':'c-red'):'c-amber'}"},{"label":"TRACKER COUNT","value":"<estimate 0-15>","color":"<c-green/c-amber/c-red>"},{"label":"AVG BUY SIZE","value":"<estimate X.XX SOL>","color":"c-blue"},{"label":"ACTIVITY (7D)","value":"${onChain?onChain.recentActivity+' txns':'X txns'}","color":"c-white"},{"label":"SOL BALANCE","value":"${onChain?onChain.solBalance+' SOL':'X.XX SOL'}","color":"c-blue"},{"label":"WALLET AGE","value":"${onChain?onChain.ageInDays+'d':'XXd'}","color":"c-white"}],"config":{"Gas (SOL)":"<0.003-0.007>","Slippage":"<15-35%>","Buy Tax Limit":"<8-25%>","Sell Tax Limit":"<8-25%>","Position Size":"<1-5% portfolio>","Anti-Rug":"ON","Max Mkt Cap":"<$50K-$500K>","Stop Loss":"<-15 to -35%>"},"analysis":"<2-3 sentences. Reference actual on-chain numbers. One strength, one risk, one action. Direct and professional.>"}`;
+{"score":${onChain?onChain.score:'<0-100>'},"scoreColor":"${onChain?(onChain.score>=70?'#00d68f':onChain.score>=50?'#ffb547':'#ff4d6a'):'#ffb547'}","verdict":"${onChain?(onChain.score>=72?'COPY NOW':onChain.score>=52?'WATCH':'SKIP'):'WATCH'}","verdictClass":"${onChain?(onChain.score>=72?'v-copy':onChain.score>=52?'v-watch':'v-skip'):'v-watch'}","metrics":[{"label":"WIN RATE","value":"${onChain?onChain.winRate+'%':'XX%'}","color":"${onChain?(onChain.winRate>=65?'c-green':onChain.winRate>=50?'c-amber':'c-red'):'c-amber'}"},{"label":"TOTAL TRADES","value":"${onChain?onChain.totalTxns:'XX'}","color":"c-white"},{"label":"SUCCESS RATE","value":"${onChain?onChain.winRate+'%':'XX%'}","color":"${onChain?(onChain.winRate>=65?'c-green':onChain.winRate>=50?'c-amber':'c-red'):'c-amber'}"},{"label":"TRACKER COUNT","value":"<estimate 0-15>","color":"<c-green/c-amber/c-red>"},{"label":"AVG BUY SIZE","value":"<estimate X.XX SOL>","color":"c-blue"},{"label":"ACTIVITY (7D)","value":"${onChain?onChain.recentActivity+' txns':'X txns'}","color":"c-white"},{"label":"SOL BALANCE","value":"${onChain?onChain.solBalance+' SOL':'X.XX SOL'}","color":"c-blue"},{"label":"WALLET AGE","value":"${onChain?onChain.ageInDays+'d':'XXd'}","color":"c-white"}],"config":{"Buy Gas":"<3-15 GWEI for ETH/Base, 0.003-0.01 SOL for Solana>","Sell Gas":"<3-15 GWEI for ETH/Base, 0.003-0.01 SOL for Solana>","Buy Slippage":"<10-30%>","Sell Slippage":"<10-25%>","Buy Tax Limit":"<8-25%>","Sell Tax Limit":"<8-25%>","Min Mkt Cap":"<$10K-$100K>","Max Mkt Cap":"<$100K-$20M>","Buy Amount":"<0.01-2 SOL/ETH>","Spending Limit":"<0.1-5 SOL/ETH>"},"analysis":"<2-3 sentences. Reference actual on-chain numbers. One strength, one risk, one action. Direct and professional.>"}`;
 
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -1737,7 +1826,7 @@ function buildFallback(onChain){
       {label:'SOL BALANCE',value:(onChain?.solBalance||'—')+' SOL',color:'c-blue'},
       {label:'WALLET AGE',value:(onChain?.ageInDays||'—')+'d',color:'c-white'}
     ],
-    config:{'Gas (SOL)':'0.005','Slippage':'20%','Buy Tax Limit':'15%','Sell Tax Limit':'15%','Position Size':'2% portfolio','Anti-Rug':'ON','Max Mkt Cap':'$200K','Stop Loss':'-25%'},
+    config:{'Buy Gas':'5 GWEI','Sell Gas':'5 GWEI','Buy Slippage':'15%','Sell Slippage':'15%','Buy Tax Limit':'8%','Sell Tax Limit':'8%','Min Mkt Cap':'$50K','Max Mkt Cap':'$20M','Buy Amount':'0.01 SOL','Spending Limit':'0.5 SOL'},
     analysis:good
       ?`This wallet shows a ${wr}% success rate across ${onChain?.totalTxns||'multiple'} on-chain transactions — strong signal for copy trading. Recent activity of ${onChain?.recentActivity||'several'} transactions confirms the wallet is actively trading. Start with 1-2% position size for one week before scaling.`
       :`Success rate of ${wr}% across ${onChain?.totalTxns||'analyzed'} transactions is below the 65% threshold for confident copying. Watch for 14 days and only proceed if recent trade quality improves.`
@@ -1767,6 +1856,8 @@ function renderResults(data,addr,onChain){
   document.getElementById('resultTs').textContent='Live analysis · '+new Date().toLocaleTimeString()+' · walletlens.dev';
 
   // External platform links
+  const configTag = document.getElementById('configChainTag');
+  if(configTag) configTag.textContent = 'Banana Gun · ' + CHAINS[activeChain].name;
   const extBar=document.getElementById('extLinks');
   if(extBar){
     extBar.style.display='flex';
