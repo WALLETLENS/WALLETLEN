@@ -212,6 +212,24 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3r
 footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bottom:0.25rem;}
 .fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.55s,transform 0.55s;}
 .fade-in.visible{opacity:1;transform:translateY(0);}
+.intel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:1.25rem;}
+.intel-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:1.25rem;position:relative;overflow:hidden;}
+.intel-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.intel-card.blue::before{background:var(--accent);}
+.intel-card.green::before{background:var(--green);}
+.intel-card.amber::before{background:var(--amber);}
+.intel-card.red::before{background:var(--red);}
+.intel-card.purple::before{background:#a78bfa;}
+.intel-label{font-family:var(--mono);font-size:0.62rem;color:var(--muted2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.5rem;}
+.intel-value{font-size:1.3rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.25rem;font-family:var(--mono);}
+.intel-sub{font-family:var(--mono);font-size:0.7rem;color:var(--muted);line-height:1.5;}
+.intel-pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:0.65rem;padding:3px 10px;border-radius:100px;margin-top:0.5rem;}
+.intel-pill.green{background:rgba(0,214,143,0.12);color:var(--green);border:1px solid rgba(0,214,143,0.25);}
+.intel-pill.amber{background:rgba(255,181,71,0.12);color:var(--amber);border:1px solid rgba(255,181,71,0.25);}
+.intel-pill.red{background:rgba(255,77,106,0.12);color:var(--red);border:1px solid rgba(255,77,106,0.25);}
+.intel-pill.blue{background:rgba(79,142,255,0.12);color:var(--accent);border:1px solid rgba(79,142,255,0.25);}
+.intel-pill.purple{background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25);}
+
 .input-error{font-family:var(--mono);font-size:0.68rem;color:var(--red);margin-top:4px;display:none;}
 .input-error.show{display:block;}
 .rate-limit-banner{background:rgba(255,77,106,0.08);border:1px solid rgba(255,77,106,0.2);border-radius:10px;padding:0.75rem 1rem;margin-bottom:1rem;font-family:var(--mono);font-size:0.72rem;color:var(--red);display:none;}
@@ -328,6 +346,33 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 
         <div class="metrics-grid" id="metricsGrid"></div>
 
+
+        <div class="intel-grid" id="intelGrid" style="display:none;">
+          <div class="intel-card blue">
+            <div class="intel-label">Copy Trader Detection</div>
+            <div class="intel-value" id="copyTraderVal">—</div>
+            <div class="intel-sub" id="copyTraderSub">Analyzing trade patterns...</div>
+            <div class="intel-pill" id="copyTraderPill">—</div>
+          </div>
+          <div class="intel-card amber">
+            <div class="intel-label">Avg Hold Time</div>
+            <div class="intel-value" id="holdTimeVal">—</div>
+            <div class="intel-sub" id="holdTimeSub">How long before they sell</div>
+            <div class="intel-pill" id="holdTimePill">—</div>
+          </div>
+          <div class="intel-card green">
+            <div class="intel-label">Recency Score</div>
+            <div class="intel-value" id="recencyVal">—</div>
+            <div class="intel-sub" id="recencySub">How active in last 7 days</div>
+            <div class="intel-pill" id="recencyPill">—</div>
+          </div>
+          <div class="intel-card purple">
+            <div class="intel-label">Trader Style</div>
+            <div class="intel-value" id="styleVal">—</div>
+            <div class="intel-sub" id="styleSub">Based on hold time & volume</div>
+            <div class="intel-pill" id="stylePill">—</div>
+          </div>
+        </div>
         <div class="chart-box" id="chartBox" style="display:none;">
           <div class="chart-header">
             <div class="chart-title">Wallet Activity</div>
@@ -359,6 +404,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
                 <th>Amount</th>
                 <th>PnL</th>
                 <th>Status</th>
+                <th>Flag</th>
               </tr>
             </thead>
             <tbody id="tradesBody"></tbody>
@@ -541,6 +587,7 @@ function resetAnalyzer(){
   document.getElementById('analyzeBtn').disabled=false;
   document.getElementById('chartBox').style.display='none';
   document.getElementById('tradesBox').style.display='none';
+  document.getElementById('intelGrid').style.display='none';
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
   rawSigs=[];
   ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id=>{
@@ -632,7 +679,42 @@ async function fetchOnChainData(wallet){
     const bestTrade=completedTrades.length>0?Math.max(...completedTrades.map(t=>t.pnlNum)):0;
     const worstTrade=completedTrades.length>0?Math.min(...completedTrades.map(t=>t.pnlNum)):0;
 
-    return{totalTxns,successTxns,failedTxns,winRate,recentActivity,solBalance,score,ageInDays,avgTradesPerDay,trades,tradeWinRate,totalPnl,bestTrade,worstTrade};
+
+    // COPY TRADER DETECTION
+    // Pattern: copy traders have very uniform time gaps between transactions
+    const timeGaps = [];
+    for(let i=1;i<Math.min(sigs.length,20);i++){
+      timeGaps.push(Math.abs(sigs[i-1].blockTime - sigs[i].blockTime));
+    }
+    const avgGap = timeGaps.length>0 ? timeGaps.reduce((a,b)=>a+b,0)/timeGaps.length : 0;
+    const gapVariance = timeGaps.length>0 ? timeGaps.reduce((a,b)=>a+Math.pow(b-avgGap,2),0)/timeGaps.length : 0;
+    const gapStdDev = Math.sqrt(gapVariance);
+    const coefficientOfVariation = avgGap>0 ? gapStdDev/avgGap : 1;
+    // Low CV = very uniform = likely copy trader. High CV = organic = likely master
+    const isCopyTrader = coefficientOfVariation < 0.4 && totalTxns > 20;
+    const copyTraderConfidence = Math.round(Math.max(0,Math.min(100,(1-coefficientOfVariation)*100)));
+
+    // HOLD TIME ANALYSIS
+    // Estimate hold time from gap between consecutive success txns
+    const successSigs = sigs.filter(s=>!s.err).slice(0,20);
+    const holdTimes = [];
+    for(let i=1;i<successSigs.length;i++){
+      const gap = Math.abs(successSigs[i-1].blockTime - successSigs[i].blockTime);
+      if(gap > 0 && gap < 86400) holdTimes.push(gap);
+    }
+    const avgHoldSeconds = holdTimes.length>0 ? holdTimes.reduce((a,b)=>a+b,0)/holdTimes.length : 0;
+    const avgHoldMins = Math.round(avgHoldSeconds/60);
+    const holdTimeStr = avgHoldMins < 5 ? '<5 min' : avgHoldMins < 60 ? avgHoldMins+' min' : Math.round(avgHoldMins/60)+' hr';
+    const traderStyle = avgHoldMins < 5 ? 'Sniper' : avgHoldMins < 30 ? 'Scalper' : avgHoldMins < 120 ? 'Swing' : 'Holder';
+
+    // RECENCY SCORE
+    const last24h = sigs.filter(s=>Date.now()/1000-s.blockTime<86400).length;
+    const last48h = sigs.filter(s=>Date.now()/1000-s.blockTime<172800).length;
+    const last7d = recentActivity;
+    const recencyScore = Math.min(100, (last24h*15)+(last48h*5)+(last7d*2));
+    const recencyLabel = recencyScore>70?'Very Active':recencyScore>40?'Active':recencyScore>15?'Slowing':recencyScore>0?'Cold':'Inactive';
+
+    return{totalTxns,successTxns,failedTxns,winRate,recentActivity,solBalance,score,ageInDays,avgTradesPerDay,trades,tradeWinRate,totalPnl,bestTrade,worstTrade,isCopyTrader,copyTraderConfidence,avgHoldMins,holdTimeStr,traderStyle,recencyScore,recencyLabel,last24h,last48h};
   }catch(e){
     console.error('RPC error:',e);
     return null;
@@ -650,6 +732,7 @@ async function runAnalysis(){
   // Clear previous results
   document.getElementById('chartBox').style.display='none';
   document.getElementById('tradesBox').style.display='none';
+  document.getElementById('intelGrid').style.display='none';
   document.getElementById('results').classList.remove('show');
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
   rawSigs=[];chartData={'1d':null,'7d':null,'30d':null};
@@ -756,19 +839,73 @@ function renderResults(data,addr,onChain){
   document.getElementById('aiBody').innerHTML=data.analysis.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
   document.getElementById('resultTs').textContent='Live analysis · '+new Date().toLocaleTimeString()+' · walletlens.dev';
 
+  // INTELLIGENCE CARDS
+  if(onChain){
+    document.getElementById('intelGrid').style.display='grid';
+
+    // Copy trader detection
+    const ctConf = onChain.copyTraderConfidence||0;
+    const isCopy = onChain.isCopyTrader;
+    document.getElementById('copyTraderVal').textContent = isCopy ? 'Likely Copy' : 'Original';
+    document.getElementById('copyTraderVal').style.color = isCopy ? 'var(--amber)' : 'var(--green)';
+    document.getElementById('copyTraderSub').textContent = isCopy
+      ? 'Trade timing suggests copying another wallet. Find the source.'
+      : 'Trade timing suggests original signals. Safe to copy.';
+    const ctPill = document.getElementById('copyTraderPill');
+    ctPill.textContent = isCopy ? '⚠ Copy ' + ctConf + '% confidence' : '✓ Master trader';
+    ctPill.className = 'intel-pill ' + (isCopy ? 'amber' : 'green');
+
+    // Hold time
+    document.getElementById('holdTimeVal').textContent = onChain.holdTimeStr||'—';
+    document.getElementById('holdTimeSub').textContent = 'Avg time between buys and sells';
+    const htPill = document.getElementById('holdTimePill');
+    const ht = onChain.avgHoldMins||0;
+    htPill.textContent = ht<5?'⚡ Sniper — bot speed required':ht<30?'🔥 Scalper — fast execution':ht<120?'📈 Swing — manageable':'💎 Holder — easy to follow';
+    htPill.className = 'intel-pill '+(ht<5?'red':ht<30?'amber':ht<120?'green':'blue');
+
+    // Recency score
+    const rs = onChain.recencyScore||0;
+    document.getElementById('recencyVal').textContent = rs+'/100';
+    document.getElementById('recencyVal').style.color = rs>70?'var(--green)':rs>40?'var(--amber)':rs>0?'var(--red)':'var(--muted)';
+    document.getElementById('recencySub').textContent = (onChain.last24h||0)+' txns (24h) · '+(onChain.last48h||0)+' txns (48h) · '+(onChain.recentActivity||0)+' txns (7d)';
+    const rPill = document.getElementById('recencyPill');
+    rPill.textContent = onChain.recencyLabel||'—';
+    rPill.className = 'intel-pill '+(rs>70?'green':rs>40?'amber':rs>0?'red':'red');
+
+    // Trader style
+    const style = onChain.traderStyle||'Unknown';
+    document.getElementById('styleVal').textContent = style;
+    document.getElementById('styleVal').style.color = '#a78bfa';
+    const styleDescs = {
+      'Sniper':'Buys within seconds of launch. Need fastest possible gas.',
+      'Scalper':'Quick in and out. Set tight stop loss, fast gas.',
+      'Swing':'Holds minutes to hours. Comfortable copy trading pace.',
+      'Holder':'Patient trader. Easy to follow, lower gas needed.'
+    };
+    document.getElementById('styleSub').textContent = styleDescs[style]||'Analyzing pattern...';
+    const sPill = document.getElementById('stylePill');
+    sPill.textContent = style==='Sniper'?'⚡ Max gas required':style==='Scalper'?'🔥 High gas recommended':style==='Swing'?'✓ Standard settings':'✓ Low gas ok';
+    sPill.className = 'intel-pill '+(style==='Sniper'?'red':style==='Scalper'?'amber':'green');
+  }
+
   // TRADE HISTORY
   if(onChain&&onChain.trades){
     const tbody=document.getElementById('tradesBody');
-    tbody.innerHTML=onChain.trades.map(t=>`
-      <tr>
+    // Known rug tokens (simplified list)
+    const RUG_TOKENS=['SLERF','BOME','MYRO','FLOKI','NEIRO','SAMO'];
+    tbody.innerHTML=onChain.trades.map(t=>{
+      const isRug = RUG_TOKENS.includes(t.token) && t.pnlNum < 0;
+      const flag = isRug ? '<span style="font-size:0.62rem;color:var(--red);background:rgba(255,77,106,0.1);border:1px solid rgba(255,77,106,0.2);padding:2px 6px;border-radius:4px;">RUG</span>' : '<span style="font-size:0.62rem;color:var(--muted2);">—</span>';
+      return `<tr>
         <td style="color:var(--muted);">${t.time}</td>
         <td><span class="trade-type-${t.type.toLowerCase()}">${t.type}</span></td>
-        <td style="font-weight:500;">${t.token}</td>
+        <td style="font-weight:500;${isRug?'color:var(--red);text-decoration:line-through;':''}">${t.token}</td>
         <td>${t.amount}</td>
         <td class="${t.pnlNum>0?'pnl-pos':t.pnlNum<0?'pnl-neg':''}">${t.pnl}</td>
         <td style="color:${t.status==='Success'?'var(--green)':'var(--red)'};font-size:0.68rem;">${t.status}</td>
-      </tr>
-    `).join('');
+        <td>${flag}</td>
+      </tr>`;
+    }).join('');
     const tp=onChain.totalPnl;
     document.getElementById('totalPnl').textContent=(tp>=0?'+$'+tp.toFixed(0):'-$'+Math.abs(tp).toFixed(0));
     document.getElementById('totalPnl').className='ts-val '+(tp>=0?'c-green':'c-red');
