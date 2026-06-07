@@ -1079,32 +1079,61 @@ async function runTokenScan() {
   document.getElementById('tokenScanLoading').classList.add('show');
   document.getElementById('tokenScanBtn').disabled = true;
 
-  // Fetch token account info from Solana
+  const isPumpFun = token.endsWith('pump') || token.endsWith('Pump');
   let tokenData = null;
-  try {
-    const res = await fetch(CHAINS.sol.rpc, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({jsonrpc:'2.0',id:1,method:'getAccountInfo',params:[token,{encoding:'jsonParsed'}]})
-    });
-    const json = await res.json();
-    tokenData = json.result?.value;
-  } catch(e) {}
-
-  // Get token signatures
+  let mintInfo = null;
   let sigCount = 0;
+  let supplyInfo = null;
+
   try {
-    const res = await fetch(CHAINS.sol.rpc, {
+    // Get account info with jsonParsed for SPL token data
+    const accountRes = await fetch(CHAINS.sol.rpc, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({jsonrpc:'2.0',id:2,method:'getSignaturesForAddress',params:[token,{limit:50}]})
+      body: JSON.stringify({jsonrpc:'2.0',id:1,method:'getAccountInfo',params:[token,{encoding:'jsonParsed','commitment':'confirmed'}]})
     });
-    const json = await res.json();
-    sigCount = (json.result || []).length;
+    const accountJson = await accountRes.json();
+    tokenData = accountJson.result?.value;
+    if(tokenData?.data?.parsed?.info) {
+      mintInfo = tokenData.data.parsed.info;
+    }
+  } catch(e) { console.error('Account fetch:', e); }
+
+  try {
+    // Get token supply
+    const supplyRes = await fetch(CHAINS.sol.rpc, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0',id:2,method:'getTokenSupply',params:[token]})
+    });
+    const supplyJson = await supplyRes.json();
+    supplyInfo = supplyJson.result?.value;
   } catch(e) {}
 
-  // Use AI to generate safety analysis
-  const safetyReport = await generateTokenSafetyReport(token, tokenData, sigCount);
+  try {
+    // Get recent transactions
+    const sigRes = await fetch(CHAINS.sol.rpc, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0',id:3,method:'getSignaturesForAddress',params:[token,{limit:50}]})
+    });
+    const sigJson = await sigRes.json();
+    sigCount = (sigJson.result || []).length;
+  } catch(e) {}
+
+  // Build enriched context for AI
+  const context = {
+    exists: !!tokenData,
+    isPumpFun,
+    hasMintAuthority: mintInfo?.mintAuthority !== null && mintInfo?.mintAuthority !== undefined,
+    hasFreezeAuthority: mintInfo?.freezeAuthority !== null && mintInfo?.freezeAuthority !== undefined,
+    decimals: mintInfo?.decimals,
+    supply: supplyInfo?.uiAmountString,
+    sigCount,
+    isInitialized: mintInfo?.isInitialized
+  };
+
+  const safetyReport = await generateTokenSafetyReport(token, context);
 
   document.getElementById('tokenScanLoading').classList.remove('show');
   renderTokenSafety(token, safetyReport, sigCount);
@@ -1112,10 +1141,19 @@ async function runTokenScan() {
   document.getElementById('tokenScanBtn').disabled = false;
 }
 
-async function generateTokenSafetyReport(token, tokenData, sigCount) {
-  const hasData = !!tokenData;
+async function generateTokenSafetyReport(token, ctx) {
+  const sigCount = ctx?.sigCount || 0;
   const prompt = `You are WalletLens token safety scanner. Analyze this Solana token: ${token}
-On-chain data: ${hasData ? 'Account exists on Solana' : 'No account data found'}, ${sigCount} recent transactions.
+
+Real on-chain data:
+- Account exists: ${ctx?.exists ? 'YES' : 'NO'}
+- Pump.fun token: ${ctx?.isPumpFun ? 'YES - launched on pump.fun bonding curve' : 'NO'}
+- Mint authority active: ${ctx?.hasMintAuthority ? 'YES (can mint more tokens - risk)' : 'NO (renounced - safer)'}
+- Freeze authority active: ${ctx?.hasFreezeAuthority ? 'YES (can freeze wallets - risk)' : 'NO (safer)'}
+- Token supply: ${ctx?.supply || 'unknown'}
+- Decimals: ${ctx?.decimals ?? 'unknown'}
+- Recent transactions: ${sigCount}
+- Token initialized: ${ctx?.isInitialized ? 'YES' : 'unknown'}
 
 Respond ONLY with valid JSON:
 {
