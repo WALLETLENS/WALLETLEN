@@ -754,8 +754,8 @@ async function runAnalysis(){
     return;
   }
 
-  // Record usage
-  recordUsage();
+  // Record usage (skip for admin)
+  if(!isAdmin()) recordUsage();
   document.getElementById('results').classList.remove('show');
   document.getElementById('loadingState').classList.add('show');
   document.getElementById('analyzeBtn').disabled=true;
@@ -1020,6 +1020,33 @@ function switchChart(btn,period){
 // SECURITY & RATE LIMITING
 const DAILY_LIMIT = 3;
 const STORAGE_KEY = 'wl_usage';
+const ADMIN_KEY = '716a50c2b2a81693';
+const ADMIN_STORAGE = 'wl_admin';
+
+// Check admin unlock on page load
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('unlock');
+  if(key === ADMIN_KEY){
+    // Store admin status in sessionStorage — clears when browser closes
+    sessionStorage.setItem(ADMIN_STORAGE, '1');
+    // Clean URL so key isn't visible
+    window.history.replaceState({}, document.title, window.location.pathname);
+    showAdminToast();
+  }
+})();
+
+function isAdmin(){
+  return sessionStorage.getItem(ADMIN_STORAGE) === '1';
+}
+
+function showAdminToast(){
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:#1d1f2a;border:1px solid rgba(0,214,143,0.3);color:#00d68f;font-family:DM Mono,monospace;font-size:0.75rem;padding:0.75rem 1.25rem;border-radius:10px;z-index:9999;';
+  toast.textContent = '✓ Admin mode — unlimited analyses';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(), 3000);
+}
 
 function getUsage(){
   try{
@@ -1041,9 +1068,10 @@ function recordUsage(){
 }
 
 function checkRateLimit(){
+  if(isAdmin()) return false; // admin bypass
   const usage = getUsage();
   const today = new Date().toDateString();
-  if(usage.date !== today) return false; // new day, reset
+  if(usage.date !== today) return false;
   return usage.count >= DAILY_LIMIT;
 }
 
@@ -1102,7 +1130,9 @@ buildLeaderboard();
   const remaining = Math.max(0, DAILY_LIMIT - count);
   const el = document.getElementById('usageCounter');
   if(el){
-    if(remaining === 0){
+    if(isAdmin()){
+      el.innerHTML = '<span style="color:var(--green)">✓ Admin mode — unlimited</span>';
+    } else if(remaining === 0){
       el.innerHTML = '<span style="color:var(--red)">Daily limit reached — <a href="#pricing" style="color:var(--accent)">Upgrade to Pro</a></span>';
     } else {
       el.textContent = remaining + ' free ' + (remaining===1?'analysis':'analyses') + ' remaining today';
