@@ -659,16 +659,16 @@ let chartData={'1d':null,'7d':null,'30d':null};
 // REAL SOLANA WALLETS — publicly known alpha wallets from GMGN, fomo.family, CT
 const ALPHA_WALLETS = {
   sol: [
-    'GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ',
-    '5tzFkiKscXHK5ZXCGbGuFTLEuLAeKTmTTyKBDPBMSRBB',
-    'BpvSB4TcCHEFBVhPqgbzmCHGVgBVwkdSNPJBNGc9JYDc',
+    '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+    '4Be9CvxqHW6BYiRAxW9Q3xu1ycTMWaL5z8NX4HR3ha7t',
+    'H72yLkhTnoBfhBTXXaj1RBXuirm8s8G5fcVh2XpQLggM',
+    'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
     'CakcnaRDHka2gXyfuxjyWrnAVzmoVTs1zFhjlMdBNNFe',
+    'ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ',
+    'HN7cABqLq46Es1jh92dQQisAi18HhanE4tTwknaHtxDp',
+    '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    'Df6yfrKC8kZE3KNkrHERKzAetSxcx7z3XKxzDJwMVARN',
     'AC5RDfQFmDS1deWZos921JfqscXdByf8BrmHx42vss9',
-    'ArAQfbzsdotoKB5jJcZa3ajqW76UkJtiFK669bWqbSx6',
-    'HWHvQhFmKkgyggSGEkBqHoMRMFBxFrpjzWqeWiR3FBke',
-    'AHLwq66Cg3CuDJTFbtZEI3a3deypSJNEgMvBEFdLQtSj',
-    '7Np41oeYqPefeNQon7dr3BKRuoTCdHgbNmAddNmBkrpU',
-    'GUfCR9mK6azb9vcpsxgXyj7XRPAynDySx1DJFQdCVqKq',
   ],
   eth: [
     '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
@@ -720,7 +720,7 @@ async function scoreWalletForLeaderboard(wallet, chain='sol') {
 
     if (chain === 'sol') {
       const [sigsRes, accountRes] = await Promise.all([
-        fetch(chainRpc, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'getSignaturesForAddress',params:[wallet,{limit:20}]})}),
+        fetch(chainRpc, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'getSignaturesForAddress',params:[wallet,{limit:10}]})}),
         fetch(chainRpc, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:2,method:'getAccountInfo',params:[wallet,{encoding:'base64'}]})})
       ]);
       const sigsJson = await sigsRes.json();
@@ -827,10 +827,10 @@ async function buildLeaderboard() {
   renderLeaderboard(valid);
 }
 
-function renderLeaderboard(wallets) {
+function renderLeaderboard(wallets, partial=false) {
   const tbody = document.getElementById('leaderboardBody');
   if (!wallets || wallets.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;font-family:var(--mono);font-size:0.75rem;color:var(--muted);">Could not load wallet data. Try refreshing.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;font-family:var(--mono);font-size:0.75rem;color:var(--muted);">No wallet data yet...</td></tr>';
     return;
   }
 
@@ -856,7 +856,7 @@ function renderLeaderboard(wallets) {
     </tr>`;
   }).join('');
 
-  document.getElementById('lbUpdated').textContent = 'Live data · Updated ' + new Date().toLocaleTimeString();
+  document.getElementById('lbUpdated').textContent = (partial ? 'Loading... ' : 'Live · ') + wallets.length + ' wallets · ' + new Date().toLocaleTimeString();
 }
 
 function analyzeFromLeaderboard(wallet){
