@@ -602,7 +602,7 @@ const CHAINS = {
     explorer: 'https://solscan.io/account/'
   },
   eth: {
-    rpc: 'https://cloudflare-eth.com',
+    rpc: 'https://eth.llamarpc.com',
     name: 'Ethereum',
     demo: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
     placeholder: 'Enter Ethereum wallet address (0x...)...',
@@ -612,7 +612,7 @@ const CHAINS = {
     explorer: 'https://etherscan.io/address/'
   },
   base: {
-    rpc: 'https://mainnet.base.org',
+    rpc: 'https://base.llamarpc.com',
     name: 'Base',
     demo: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
     placeholder: 'Enter Base wallet address (0x...)...',
@@ -745,16 +745,28 @@ async function scoreWalletForLeaderboard(wallet, chain='sol') {
       return { wallet, score, winRate, recentActivity, totalTxns, chain };
 
     } else {
-      // ETH / Base
-      const [txRes, balRes] = await Promise.all([
-        fetch(chainRpc, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_getTransactionCount',params:[wallet,'latest']})}),
-        fetch(chainRpc, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:2,method:'eth_getBalance',params:[wallet,'latest']})})
-      ]);
+      // ETH / Base — sequential with delay to avoid rate limits
+      await sleep(Math.random() * 300);
+      const txRes = await fetch(chainRpc, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_getTransactionCount',params:[wallet,'latest']})
+      });
       const txJson = await txRes.json();
-      const balJson = await balRes.json();
+      if(txJson.error) return null;
       const totalTxns = parseInt(txJson.result, 16) || 0;
+      if(totalTxns === 0) return null;
+
+      await sleep(100);
+      const balRes = await fetch(chainRpc, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({jsonrpc:'2.0',id:2,method:'eth_getBalance',params:[wallet,'latest']})
+      });
+      const balJson = await balRes.json();
+      if(balJson.error) return null;
       const balance = (parseInt(balJson.result, 16) / 1e18).toFixed(4);
-      if (totalTxns === 0) return null;
+
       const score = Math.max(10, Math.min(90,
         Math.min(30, Math.floor(totalTxns/50)) +
         Math.min(20, parseFloat(balance)>0.1?20:parseFloat(balance)>0.01?10:2) +
@@ -781,18 +793,30 @@ async function buildLeaderboard() {
   }
 
   // Show loading state
+  const chainName = CHAINS[chain].name;
   tbody.innerHTML = `
     <tr><td colspan="7" style="text-align:center;padding:2rem;">
       <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
         <div style="width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.75s linear infinite;"></div>
-        <span style="font-family:var(--mono);font-size:0.75rem;color:var(--muted);">Scanning Solana wallets live...</span>
+        <span style="font-family:var(--mono);font-size:0.75rem;color:var(--muted);">Scanning ${chainName} wallets live...</span>
       </div>
     </td></tr>`;
-  lbUpdated.textContent = 'Loading live data...';
+  lbUpdated.textContent = 'Loading ' + chainName + ' data...';
 
-  // Score all wallets in parallel using correct chain
+  // Score wallets - parallel for SOL, batched for EVM to avoid rate limits
   const wallets = ALPHA_WALLETS[chain] || ALPHA_WALLETS.sol;
-  const results = await Promise.all(wallets.map(w => scoreWalletForLeaderboard(w, chain)));
+  let results = [];
+  if(chain === 'sol') {
+    results = await Promise.all(wallets.map(w => scoreWalletForLeaderboard(w, chain)));
+  } else {
+    // Batch EVM calls in groups of 3 with delay between batches
+    for(let i = 0; i < wallets.length; i += 3) {
+      const batch = wallets.slice(i, i+3);
+      const batchResults = await Promise.all(batch.map(w => scoreWalletForLeaderboard(w, chain)));
+      results.push(...batchResults);
+      if(i + 3 < wallets.length) await sleep(400);
+    }
+  }
   const valid = results
     .filter(r => r !== null)
     .sort((a, b) => b.score - a.score)
