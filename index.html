@@ -229,6 +229,11 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 .intel-pill.red{background:rgba(255,77,106,0.12);color:var(--red);border:1px solid rgba(255,77,106,0.25);}
 .intel-pill.blue{background:rgba(79,142,255,0.12);color:var(--accent);border:1px solid rgba(79,142,255,0.25);}
 .intel-pill.purple{background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25);}
+.tooltip-trigger{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.1);color:var(--muted);font-size:0.6rem;cursor:pointer;margin-left:4px;font-family:var(--mono);transition:background 0.15s;vertical-align:middle;}
+.tooltip-trigger:hover{background:rgba(79,142,255,0.3);color:var(--accent);}
+.tooltip-box{display:none;position:absolute;top:2.5rem;left:0;right:0;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:0.75rem;font-family:var(--mono);font-size:0.68rem;color:rgba(232,234,242,0.7);line-height:1.6;z-index:10;}
+.tooltip-box.show{display:block;}
+
 
 .input-error{font-family:var(--mono);font-size:0.68rem;color:var(--red);margin-top:4px;display:none;}
 .input-error.show{display:block;}
@@ -349,7 +354,8 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 
         <div class="intel-grid" id="intelGrid" style="display:none;">
           <div class="intel-card blue">
-            <div class="intel-label">Copy Trader Detection</div>
+            <div class="intel-label">Copy Pattern Signal <span class="tooltip-trigger" onclick="toggleTooltip('ctTooltip')">?</span></div>
+            <div class="tooltip-box" id="ctTooltip">Based on timing uniformity of last 100 transactions. Uniform gaps suggest copying another wallet. Organic traders show irregular timing. ~65% accurate — use as a signal, not a guarantee.</div>
             <div class="intel-value" id="copyTraderVal">—</div>
             <div class="intel-sub" id="copyTraderSub">Analyzing trade patterns...</div>
             <div class="intel-pill" id="copyTraderPill">—</div>
@@ -843,16 +849,16 @@ function renderResults(data,addr,onChain){
   if(onChain){
     document.getElementById('intelGrid').style.display='grid';
 
-    // Copy trader detection
+    // Copy pattern signal
     const ctConf = onChain.copyTraderConfidence||0;
     const isCopy = onChain.isCopyTrader;
-    document.getElementById('copyTraderVal').textContent = isCopy ? 'Likely Copy' : 'Original';
+    document.getElementById('copyTraderVal').textContent = isCopy ? 'Copy Pattern' : 'Original';
     document.getElementById('copyTraderVal').style.color = isCopy ? 'var(--amber)' : 'var(--green)';
     document.getElementById('copyTraderSub').textContent = isCopy
-      ? 'Trade timing suggests copying another wallet. Find the source.'
-      : 'Trade timing suggests original signals. Safe to copy.';
+      ? 'Uniform trade timing detected. May be mirroring another wallet — verify before copying.'
+      : 'Organic trade timing. Likely generating own signals.';
     const ctPill = document.getElementById('copyTraderPill');
-    ctPill.textContent = isCopy ? '⚠ Copy ' + ctConf + '% confidence' : '✓ Master trader';
+    ctPill.textContent = isCopy ? '⚠ ~' + ctConf + '% signal strength' : '✓ Timing looks organic';
     ctPill.className = 'intel-pill ' + (isCopy ? 'amber' : 'green');
 
     // Hold time
@@ -1070,6 +1076,20 @@ function copyAddress(addr){
     const el = document.getElementById('copyAddrBtn');
     if(el){ el.textContent = 'Copied!'; setTimeout(()=>el.textContent='Copy', 1500); }
   });
+}
+
+function toggleTooltip(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('show');
+  // Close on outside click
+  setTimeout(()=>{
+    document.addEventListener('click', function closeTooltip(e){
+      if(!e.target.classList.contains('tooltip-trigger')){
+        document.querySelectorAll('.tooltip-box').forEach(t=>t.classList.remove('show'));
+        document.removeEventListener('click', closeTooltip);
+      }
+    });
+  }, 100);
 }
 
 buildLeaderboard();
