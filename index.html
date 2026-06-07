@@ -132,6 +132,19 @@ h1 .hl { background: linear-gradient(135deg, #4f8eff, #a78bfa); -webkit-backgrou
 .ai-body { font-size: 0.9rem; color: rgba(232,234,242,0.75); line-height: 1.75; font-family: var(--mono); }
 
 .result-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 0.75rem; }
+.chart-box { background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.chart-title { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.chart-title::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.chart-tabs { display: flex; gap: 4px; }
+.chart-tab { font-family: var(--mono); font-size: 0.68rem; padding: 4px 12px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border2); color: var(--muted); background: transparent; transition: all 0.15s; }
+.chart-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.chart-tab:hover:not(.active) { border-color: var(--border3); color: var(--text); }
+.chart-canvas-wrap { position: relative; height: 180px; }
+.chart-stats { display: flex; gap: 1.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.chart-stat { display: flex; flex-direction: column; gap: 2px; }
+.chart-stat-label { font-family: var(--mono); font-size: 0.62rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; }
+.chart-stat-val { font-family: var(--mono); font-size: 0.9rem; font-weight: 500; }
 .result-ts { font-family: var(--mono); font-size: 0.68rem; color: var(--muted2); }
 .btn-reset { background: transparent; color: var(--muted); border: 1px solid var(--border2); padding: 0.5rem 1rem; border-radius: 8px; font-family: var(--mono); font-size: 0.72rem; cursor: pointer; transition: all 0.15s; }
 .btn-reset:hover { color: var(--text); border-color: var(--border3); }
@@ -272,6 +285,26 @@ footer p { font-size: 0.8rem; color: var(--muted2); font-family: var(--mono); ma
         </div>
 
         <div class="metrics-grid" id="metricsGrid"></div>
+        <div class="chart-box" id="chartBox" style="display:none;">
+          <div class="chart-header">
+            <div class="chart-title">Wallet Activity</div>
+            <div class="chart-tabs">
+              <button class="chart-tab active" onclick="switchChart('1d')">1D</button>
+              <button class="chart-tab" onclick="switchChart('7d')">7D</button>
+              <button class="chart-tab" onclick="switchChart('30d')">30D</button>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="activityChart"></canvas>
+          </div>
+          <div class="chart-stats">
+            <div class="chart-stat"><div class="chart-stat-label">Peak Day</div><div class="chart-stat-val" id="chartPeak">—</div></div>
+            <div class="chart-stat"><div class="chart-stat-label">Avg / Day</div><div class="chart-stat-val" id="chartAvg">—</div></div>
+            <div class="chart-stat"><div class="chart-stat-label">Total Period</div><div class="chart-stat-val" id="chartTotal">—</div></div>
+            <div class="chart-stat"><div class="chart-stat-label">Trend</div><div class="chart-stat-val" id="chartTrend">—</div></div>
+          </div>
+        </div>
+
         <div class="token-section" id="tokenSection" style="display:none;">
           <div class="token-box">
             <div class="token-box-title">Recent Winners</div>
@@ -362,9 +395,11 @@ footer p { font-size: 0.8rem; color: var(--muted2); font-family: var(--mono); ma
   <p style="margin-top:1rem;opacity:0.5;font-size:0.72rem;">Not financial advice. All analysis is informational only. Crypto trading involves significant risk.</p>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 const RPC = 'https://cosmopolitan-tiniest-arm.solana-mainnet.quiknode.pro/ac776064cb8c9f4331d354e5a00fb531af49988c/';
 const DEMO = '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM';
+let rawSigs = [];
 
 function loadDemo() { document.getElementById('walletInput').value = DEMO; }
 
@@ -373,6 +408,9 @@ function resetAnalyzer() {
   document.getElementById('loadingState').classList.remove('show');
   document.getElementById('walletInput').value = '';
   document.getElementById('analyzeBtn').disabled = false;
+  document.getElementById('chartBox').style.display = 'none';
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  rawSigs = [];
   ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id => {
     const el = document.getElementById(id);
     el.classList.remove('active','done');
@@ -407,6 +445,7 @@ async function fetchOnChainData(wallet) {
     await advanceStep('ls1', null);
     const sigs = await rpc('getSignaturesForAddress', [wallet, { limit: 100 }]);
     if (!sigs || sigs.length === 0) return null;
+    rawSigs = sigs;
 
     await advanceStep('ls2', 'ls1');
     const accountInfo = await rpc('getAccountInfo', [wallet, { encoding: 'base64' }]);
@@ -591,6 +630,140 @@ function renderResults(data, addr, onChain) {
   `).join('');
   document.getElementById('aiBody').innerHTML = data.analysis.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
   document.getElementById('resultTs').textContent = 'Live analysis · '+new Date().toLocaleTimeString()+' · walletlens.dev';
+
+  if (rawSigs.length > 0) {
+    chartData['1d'] = buildChartData(rawSigs, '1d');
+    chartData['7d'] = buildChartData(rawSigs, '7d');
+    chartData['30d'] = buildChartData(rawSigs, '30d');
+    document.getElementById('chartBox').style.display = 'block';
+    currentPeriod = '1d';
+    document.querySelectorAll('.chart-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+    setTimeout(() => renderChart('1d'), 100);
+  }
+}
+
+
+// CHART
+let chartInstance = null;
+let chartData = { '1d': null, '7d': null, '30d': null };
+let currentPeriod = '1d';
+
+function buildChartData(sigs, period) {
+  const now = Date.now() / 1000;
+  const periods = { '1d': 86400, '7d': 604800, '30d': 2592000 };
+  const buckets = { '1d': 24, '7d': 7, '30d': 30 };
+  const labels = { '1d': 'hours', '7d': 'days', '30d': 'days' };
+  const cutoff = now - periods[period];
+  const filtered = sigs.filter(s => s.blockTime >= cutoff);
+  const bucketCount = buckets[period];
+  const bucketSize = periods[period] / bucketCount;
+  const counts = new Array(bucketCount).fill(0);
+  const success = new Array(bucketCount).fill(0);
+  filtered.forEach(s => {
+    const idx = Math.floor((s.blockTime - cutoff) / bucketSize);
+    if (idx >= 0 && idx < bucketCount) {
+      counts[idx]++;
+      if (!s.err) success[idx]++;
+    }
+  });
+  const labelArr = [];
+  for (let i = 0; i < bucketCount; i++) {
+    if (period === '1d') labelArr.push(i + 'h');
+    else if (period === '7d') {
+      const d = new Date((cutoff + i * bucketSize) * 1000);
+      labelArr.push(d.toLocaleDateString('en', {weekday:'short'}));
+    } else {
+      const d = new Date((cutoff + i * bucketSize) * 1000);
+      labelArr.push(d.toLocaleDateString('en', {month:'short', day:'numeric'}));
+    }
+  }
+  return { counts, success, labelArr, total: filtered.length };
+}
+
+function renderChart(period) {
+  const data = chartData[period];
+  if (!data) return;
+  const ctx = document.getElementById('activityChart').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+
+  const peak = Math.max(...data.counts);
+  const avg = data.total > 0 ? (data.total / data.counts.length).toFixed(1) : '0';
+  const firstHalf = data.counts.slice(0, Math.floor(data.counts.length/2)).reduce((a,b)=>a+b,0);
+  const secondHalf = data.counts.slice(Math.floor(data.counts.length/2)).reduce((a,b)=>a+b,0);
+  const trend = secondHalf > firstHalf ? '↑ Increasing' : secondHalf < firstHalf ? '↓ Decreasing' : '→ Stable';
+  const trendColor = secondHalf > firstHalf ? '#00d68f' : secondHalf < firstHalf ? '#ff4d6a' : '#ffb547';
+
+  document.getElementById('chartPeak').textContent = peak + ' txns';
+  document.getElementById('chartAvg').textContent = avg + ' txns';
+  document.getElementById('chartTotal').textContent = data.total + ' txns';
+  document.getElementById('chartTrend').textContent = trend;
+  document.getElementById('chartTrend').style.color = trendColor;
+
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.labelArr,
+      datasets: [{
+        label: 'Transactions',
+        data: data.counts,
+        backgroundColor: data.counts.map((v, i) => {
+          const ratio = peak > 0 ? v / peak : 0;
+          return `rgba(79,142,255,${0.2 + ratio * 0.7})`;
+        }),
+        borderColor: data.counts.map((v, i) => {
+          const ratio = peak > 0 ? v / peak : 0;
+          return ratio > 0.7 ? '#4f8eff' : 'rgba(79,142,255,0.3)';
+        }),
+        borderWidth: 1,
+        borderRadius: 4,
+      }, {
+        label: 'Successful',
+        data: data.success,
+        backgroundColor: 'rgba(0,214,143,0.15)',
+        borderColor: 'rgba(0,214,143,0.5)',
+        borderWidth: 1,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1d1f2a',
+          titleColor: '#e8eaf2',
+          bodyColor: 'rgba(232,234,242,0.6)',
+          borderColor: 'rgba(255,255,255,0.12)',
+          borderWidth: 1,
+          callbacks: {
+            title: (items) => items[0].label,
+            label: (item) => item.datasetIndex === 0
+              ? ` ${item.raw} total txns`
+              : ` ${item.raw} successful`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+          ticks: { color: 'rgba(232,234,242,0.3)', font: { family: 'DM Mono', size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+          ticks: { color: 'rgba(232,234,242,0.3)', font: { family: 'DM Mono', size: 10 } },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+function switchChart(period) {
+  currentPeriod = period;
+  document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderChart(period);
 }
 
 const obs = new IntersectionObserver(entries=>{
