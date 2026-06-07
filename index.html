@@ -497,38 +497,36 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 
 <section class="section" id="pricing" style="text-align:center;">
   <div class="section-eyebrow" style="justify-content:center;display:flex;">PRICING</div>
-  <h2 class="section-title fade-in">Start free. Upgrade when it pays.</h2>
-  <p class="section-desc fade-in" style="margin:0 auto 3rem;">One avoided bad trade covers months of Pro.</p>
-  <div class="pricing-wrap">
-    <div class="price-card fade-in">
-      <div class="plan-label">Free</div>
+  <h2 class="section-title fade-in">Free while we build.<br>Pro coming soon.</h2>
+  <p class="section-desc fade-in" style="margin:0 auto 3rem;">WalletLens is completely free during our beta. Pro features are coming — join the waitlist to get early access and a launch discount.</p>
+
+  <div style="max-width:520px;margin:0 auto;">
+    <div class="price-card fade-in" style="text-align:left;">
+      <div class="plan-label">Currently Free — Beta</div>
       <div class="plan-amount">$0</div>
-      <p class="plan-tagline">Try it. Verify it works. No card needed.</p>
+      <p class="plan-tagline">Everything is free right now. No card, no signup, no limits during beta.</p>
       <ul class="plan-feats">
-        <li><div class="feat-check"></div>3 wallet analyses per day</li>
-        <li><div class="feat-check"></div>Real on-chain data</li>
+        <li><div class="feat-check"></div>Real on-chain Solana data</li>
+        <li><div class="feat-check"></div>Full wallet score & verdict</li>
+        <li><div class="feat-check"></div>Trade history & PnL breakdown</li>
         <li><div class="feat-check"></div>Activity chart (1D/7D/30D)</li>
-        <li><div class="feat-check"></div>Trade history & PnL</li>
-        <li><div class="feat-check"></div>Basic Banana Gun config</li>
-        <li><div class="feat-check"></div>Daily leaderboard access</li>
+        <li><div class="feat-check"></div>Copy pattern detection</li>
+        <li><div class="feat-check"></div>Hold time & trader style</li>
+        <li><div class="feat-check"></div>Recency score</li>
+        <li><div class="feat-check"></div>Exact Banana Gun settings</li>
+        <li><div class="feat-check"></div>Live wallet leaderboard</li>
       </ul>
-      <button class="plan-btn plan-btn-outline" onclick="document.getElementById('analyzer').scrollIntoView({behavior:'smooth'})">Get Started Free</button>
+      <button class="plan-btn plan-btn-outline" onclick="document.getElementById('analyzer').scrollIntoView({behavior:'smooth'})">Start Analyzing Free →</button>
     </div>
-    <div class="price-card featured fade-in">
-      <div class="plan-label">Pro</div>
-      <div class="plan-amount"><sup>$</sup>29<sub>/mo</sub></div>
-      <p class="plan-tagline">For traders running real capital who need every edge.</p>
-      <ul class="plan-feats">
-        <li><div class="feat-check"></div>Unlimited wallet analyses</li>
-        <li><div class="feat-check"></div>Full 8-factor score breakdown</li>
-        <li><div class="feat-check"></div>Extended trade history (500 txns)</li>
-        <li><div class="feat-check"></div>Priority AI analysis</li>
-        <li><div class="feat-check"></div>Maestro + Banana Gun configs</li>
-        <li><div class="feat-check"></div>Early access to new features</li>
-        <li><div class="feat-soon"></div><span>Telegram wallet alerts <span class="soon-label">(coming soon)</span></span></li>
-        <li><div class="feat-soon"></div><span>Cold wallet detection <span class="soon-label">(coming soon)</span></span></li>
-      </ul>
-      <button class="plan-btn plan-btn-fill" onclick="window.location.href='https://buy.stripe.com/5kQ9AM5vkdhm0P3e7L8ww00'">Get Pro — $29/mo</button>
+
+    <div style="margin-top:1.5rem;background:var(--bg2);border:1px solid rgba(79,142,255,0.2);border-radius:16px;padding:1.75rem;text-align:left;">
+      <div style="font-family:var(--mono);font-size:0.68rem;color:var(--accent);letter-spacing:0.1em;margin-bottom:0.75rem;">PRO — COMING SOON</div>
+      <p style="font-size:0.9rem;color:var(--muted);line-height:1.7;margin-bottom:1.25rem;">Unlimited analyses, Telegram wallet alerts, cold wallet detection, multi-wallet watchlist, and more. Join the waitlist to get notified first and lock in early pricing.</p>
+      <div style="display:flex;gap:8px;">
+        <input id="waitlistEmail" type="email" placeholder="your@email.com" style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:0.75rem 1rem;color:var(--text);font-family:var(--mono);font-size:0.8rem;outline:none;min-width:0;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"/>
+        <button onclick="joinWaitlist()" style="background:var(--accent);color:#fff;border:none;padding:0.75rem 1.25rem;border-radius:8px;font-family:var(--sans);font-weight:600;font-size:0.875rem;cursor:pointer;white-space:nowrap;">Join Waitlist</button>
+      </div>
+      <div id="waitlistMsg" style="display:none;margin-top:0.75rem;font-family:var(--mono);font-size:0.72rem;color:var(--green);">✓ You're on the list. We'll email you when Pro launches.</div>
     </div>
   </div>
 </section>
@@ -1222,6 +1220,26 @@ function toggleTooltip(id){
 }
 
 buildLeaderboard();
+
+function joinWaitlist(){
+  const email = document.getElementById('waitlistEmail').value.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!email || !emailRegex.test(email)){
+    document.getElementById('waitlistEmail').style.borderColor = 'var(--red)';
+    setTimeout(()=>document.getElementById('waitlistEmail').style.borderColor='', 1500);
+    return;
+  }
+  // Store in localStorage
+  const waitlist = JSON.parse(localStorage.getItem('wl_waitlist') || '[]');
+  if(!waitlist.includes(email)){
+    waitlist.push(email);
+    localStorage.setItem('wl_waitlist', JSON.stringify(waitlist));
+  }
+  document.getElementById('waitlistEmail').value = '';
+  document.getElementById('waitlistMsg').style.display = 'block';
+  // In production you'd POST this to a backend or Mailchimp
+  console.log('Waitlist signup:', email);
+}
 
 // Show usage counter
 (function(){
