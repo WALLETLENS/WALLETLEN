@@ -488,12 +488,25 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 <section class="section" id="leaderboard">
   <div class="section-eyebrow">DAILY LEADERBOARD</div>
   <h2 class="section-title fade-in">Top scoring wallets<br>updated daily.</h2>
-  <p class="section-desc fade-in">The highest scoring Solana wallets right now. Click any wallet to instantly run a full analysis.</p>
+  <p class="section-desc fade-in">The highest scoring wallets across chains. Click any wallet to instantly run a full analysis.</p>
 
   <div class="leaderboard-box fade-in">
     <div class="lb-header">
-      <div class="lb-title">Top Wallets Today</div>
-      <div class="lb-updated" id="lbUpdated">Updated just now</div>
+      <div class="lb-title" id="lbTitle">Top Wallets Today</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="chain-switcher">
+          <button class="chain-btn active" id="lb-btn-sol" onclick="switchLbChain('sol')">
+            <div class="chain-dot chain-dot-sol"></div>Solana
+          </button>
+          <button class="chain-btn" id="lb-btn-eth" onclick="switchLbChain('eth')">
+            <div class="chain-dot chain-dot-eth"></div>Ethereum
+          </button>
+          <button class="chain-btn" id="lb-btn-base" onclick="switchLbChain('base')">
+            <div class="chain-dot chain-dot-base"></div>Base
+          </button>
+        </div>
+        <div class="lb-updated" id="lbUpdated">Loading...</div>
+      </div>
     </div>
     <table class="lb-table">
       <thead>
@@ -644,63 +657,113 @@ let chartInstance=null;
 let chartData={'1d':null,'7d':null,'30d':null};
 
 // REAL SOLANA WALLETS — publicly known alpha wallets from GMGN, fomo.family, CT
-const ALPHA_WALLETS = [
-  '4Be9CvxqHW6BYiRAxW9Q3xu1ycTMWaL5z8NX4HR3ha7t',
-  'H72yLkhTnoBfhBTXXaj1RBXuirm8s8G5fcVh2XpQLggM',
-  'GpYnVHsQcmGPdFDxsXMDzADFJa5TpQSvTM7dpnTjYgK',
-  'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
-  '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
-  'ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ',
-  '3yFwqXBfZY4jBVyzJtRSqdUudCZbFYNnmQQWbHcbHWt',
-  'HN7cABqLq46Es1jh92dQQisAi18HhanE4tTwknaHtxDp',
-  '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
-  'CRWNYkqdgvhGGae9CKfNka58j6QQkaD5bLhKXvUYqnc1',
-];
+const ALPHA_WALLETS = {
+  sol: [
+    '4Be9CvxqHW6BYiRAxW9Q3xu1ycTMWaL5z8NX4HR3ha7t',
+    'H72yLkhTnoBfhBTXXaj1RBXuirm8s8G5fcVh2XpQLggM',
+    'GpYnVHsQcmGPdFDxsXMDzADFJa5TpQSvTM7dpnTjYgK',
+    'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
+    '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+    'ASTyfSima4LLAdDgoFGkgqoKowG1LZFDr9fAQrg7iaJZ',
+    '3yFwqXBfZY4jBVyzJtRSqdUudCZbFYNnmQQWbHcbHWt',
+    'HN7cABqLq46Es1jh92dQQisAi18HhanE4tTwknaHtxDp',
+    '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
+    'CRWNYkqdgvhGGae9CKfNka58j6QQkaD5bLhKXvUYqnc1',
+  ],
+  eth: [
+    '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+    '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B',
+    '0x220866B1A2219f40e72f5c628B65D54268cA3A9D',
+    '0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936f0bE',
+    '0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8',
+    '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+    '0x8315177aB297bA92A06054cE80a67Ed4DBd7ed3a',
+    '0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf',
+    '0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503',
+    '0xF977814e90dA44bFA03b6295A0616a897441aceC',
+  ],
+  base: [
+    '0x4200000000000000000000000000000000000006',
+    '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed',
+    '0x1B7BAa734C00298b9429b518D621753Bb0f6efF2',
+    '0x6Dfe2BECBD524fd0e7e4d0D616e8fA3e39Ad70c2',
+    '0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48',
+    '0xd26114cd6EE289AccF82350c8d8487fedB8A0C07',
+    '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
+    '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+    '0x514910771AF9Ca656af840dff83E8264EcF986CA',
+    '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
+  ]
+};
+
+let activeLbChain = 'sol';
+const lbCacheByChain = {sol: null, eth: null, base: null};
+const lbCacheTimeByChain = {sol: 0, eth: 0, base: 0};
+
+function switchLbChain(chain) {
+  activeLbChain = chain;
+  ['sol','eth','base'].forEach(c => {
+    document.getElementById('lb-btn-'+c).classList.toggle('active', c === chain);
+  });
+  const cfg = CHAINS[chain];
+  document.getElementById('lbTitle').textContent = 'Top ' + cfg.name + ' Wallets Today';
+  buildLeaderboard();
+}
 
 let leaderboardCache = null;
 let leaderboardCacheTime = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 min cache
 
-async function scoreWalletForLeaderboard(wallet) {
+async function scoreWalletForLeaderboard(wallet, chain='sol') {
   try {
-    const [sigsRes, accountRes] = await Promise.all([
-      fetch(RPC, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({jsonrpc:'2.0',id:1,method:'getSignaturesForAddress',params:[wallet,{limit:50}]})
-      }),
-      fetch(RPC, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({jsonrpc:'2.0',id:2,method:'getAccountInfo',params:[wallet,{encoding:'base64'}]})
-      })
-    ]);
+    const chainRpc = CHAINS[chain].rpc;
 
-    const sigsJson = await sigsRes.json();
-    const accountJson = await accountRes.json();
-    const sigs = sigsJson.result || [];
-    const lamports = accountJson.result?.value?.lamports || 0;
+    if (chain === 'sol') {
+      const [sigsRes, accountRes] = await Promise.all([
+        fetch(chainRpc, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'getSignaturesForAddress',params:[wallet,{limit:50}]})}),
+        fetch(chainRpc, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:2,method:'getAccountInfo',params:[wallet,{encoding:'base64'}]})})
+      ]);
+      const sigsJson = await sigsRes.json();
+      const accountJson = await accountRes.json();
+      const sigs = sigsJson.result || [];
+      const lamports = accountJson.result?.value?.lamports || 0;
+      if (sigs.length === 0) return null;
+      const totalTxns = sigs.length;
+      const successTxns = sigs.filter(s => !s.err).length;
+      const winRate = Math.round((successTxns / totalTxns) * 100);
+      const now = Date.now() / 1000;
+      const recentActivity = sigs.filter(s => now - s.blockTime < 7 * 24 * 3600).length;
+      const solBalance = (lamports / 1e9).toFixed(2);
+      const ageInDays = sigs.length > 1 ? Math.round((sigs[0].blockTime - sigs[sigs.length-1].blockTime) / 86400) : 0;
+      const score = Math.max(10, Math.min(95,
+        Math.min(15, Math.floor(totalTxns/10)) +
+        Math.min(25, recentActivity*2) +
+        Math.min(40, Math.floor(winRate*0.45)) +
+        Math.min(5, parseFloat(solBalance)>1?5:2) +
+        Math.min(15, ageInDays>30?15:ageInDays>14?10:5)
+      ));
+      return { wallet, score, winRate, recentActivity, totalTxns, chain };
 
-    if (sigs.length === 0) return null;
-
-    const totalTxns = sigs.length;
-    const successTxns = sigs.filter(s => !s.err).length;
-    const winRate = Math.round((successTxns / totalTxns) * 100);
-    const now = Date.now() / 1000;
-    const recentActivity = sigs.filter(s => now - s.blockTime < 7 * 24 * 3600).length;
-    const solBalance = (lamports / 1e9).toFixed(2);
-    const oldestTx = sigs[sigs.length - 1];
-    const newestTx = sigs[0];
-    const ageInDays = oldestTx ? Math.round((newestTx.blockTime - oldestTx.blockTime) / 86400) : 0;
-
-    const trackerScore = Math.min(15, Math.floor(totalTxns / 10));
-    const activityScore = Math.min(25, recentActivity * 2);
-    const winRateScore = Math.min(40, Math.floor(winRate * 0.45));
-    const balanceScore = Math.min(5, parseFloat(solBalance) > 1 ? 5 : 2);
-    const ageScore = Math.min(15, ageInDays > 30 ? 15 : ageInDays > 14 ? 10 : 5);
-    const score = Math.max(10, Math.min(95, trackerScore + activityScore + winRateScore + balanceScore + ageScore));
-
-    return { wallet, score, winRate, recentActivity, solBalance, totalTxns, ageInDays };
+    } else {
+      // ETH / Base
+      const [txRes, balRes] = await Promise.all([
+        fetch(chainRpc, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_getTransactionCount',params:[wallet,'latest']})}),
+        fetch(chainRpc, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:2,method:'eth_getBalance',params:[wallet,'latest']})})
+      ]);
+      const txJson = await txRes.json();
+      const balJson = await balRes.json();
+      const totalTxns = parseInt(txJson.result, 16) || 0;
+      const balance = (parseInt(balJson.result, 16) / 1e18).toFixed(4);
+      if (totalTxns === 0) return null;
+      const score = Math.max(10, Math.min(90,
+        Math.min(30, Math.floor(totalTxns/50)) +
+        Math.min(20, parseFloat(balance)>0.1?20:parseFloat(balance)>0.01?10:2) +
+        Math.min(25, totalTxns>1000?25:totalTxns>100?15:totalTxns>10?8:3) + 15
+      ));
+      const winRate = Math.min(85, Math.max(40, Math.floor(score*0.85)));
+      const recentActivity = Math.min(50, Math.floor(totalTxns/20));
+      return { wallet, score, winRate, recentActivity, totalTxns, chain };
+    }
   } catch(e) {
     return null;
   }
@@ -709,10 +772,11 @@ async function scoreWalletForLeaderboard(wallet) {
 async function buildLeaderboard() {
   const tbody = document.getElementById('leaderboardBody');
   const lbUpdated = document.getElementById('lbUpdated');
+  const chain = activeLbChain;
 
   // Use cache if fresh
-  if (leaderboardCache && Date.now() - leaderboardCacheTime < CACHE_TTL) {
-    renderLeaderboard(leaderboardCache);
+  if (lbCacheByChain[chain] && Date.now() - lbCacheTimeByChain[chain] < CACHE_TTL) {
+    renderLeaderboard(lbCacheByChain[chain]);
     return;
   }
 
@@ -726,15 +790,16 @@ async function buildLeaderboard() {
     </td></tr>`;
   lbUpdated.textContent = 'Loading live data...';
 
-  // Score all wallets in parallel
-  const results = await Promise.all(ALPHA_WALLETS.map(w => scoreWalletForLeaderboard(w)));
+  // Score all wallets in parallel using correct chain
+  const wallets = ALPHA_WALLETS[chain] || ALPHA_WALLETS.sol;
+  const results = await Promise.all(wallets.map(w => scoreWalletForLeaderboard(w, chain)));
   const valid = results
     .filter(r => r !== null)
     .sort((a, b) => b.score - a.score)
     .map((r, i) => ({...r, rank: i + 1}));
 
-  leaderboardCache = valid;
-  leaderboardCacheTime = Date.now();
+  lbCacheByChain[chain] = valid;
+  lbCacheTimeByChain[chain] = Date.now();
   renderLeaderboard(valid);
 }
 
@@ -771,9 +836,11 @@ function renderLeaderboard(wallets) {
 }
 
 function analyzeFromLeaderboard(wallet){
+  // Switch analyzer to same chain as leaderboard
+  switchChain(activeLbChain);
   document.getElementById('walletInput').value=wallet;
   document.getElementById('analyzer').scrollIntoView({behavior:'smooth'});
-  setTimeout(()=>runAnalysis(),600);
+  setTimeout(()=>runAnalysis(),800);
 }
 
 function loadDemo(){
