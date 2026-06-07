@@ -638,6 +638,25 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
             </div>
           </div>
 
+          <!-- PnL Line Chart -->
+          <div class="chart-box" id="pnlChartBox" style="display:none;">
+            <div class="chart-header">
+              <div class="chart-title">PnL Over Time</div>
+              <div class="chart-tabs">
+                <button class="chart-tab active" onclick="switchPnlChart(this,'1d')">1D</button>
+                <button class="chart-tab" onclick="switchPnlChart(this,'7d')">7D</button>
+                <button class="chart-tab" onclick="switchPnlChart(this,'30d')">30D</button>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap"><canvas id="pnlChart"></canvas></div>
+            <div class="chart-stats">
+              <div class="chart-stat"><div class="chart-stat-label">Peak PnL</div><div class="chart-stat-val c-green" id="pnlPeak">—</div></div>
+              <div class="chart-stat"><div class="chart-stat-label">Lowest</div><div class="chart-stat-val c-red" id="pnlLow">—</div></div>
+              <div class="chart-stat"><div class="chart-stat-label">Net</div><div class="chart-stat-val" id="pnlNet">—</div></div>
+              <div class="chart-stat"><div class="chart-stat-label">Trend</div><div class="chart-stat-val" id="pnlTrend">—</div></div>
+            </div>
+          </div>
+
           <!-- AI Report -->
           <div class="ai-block">
             <div class="ai-badge">◆ AI INTELLIGENCE REPORT</div>
@@ -1349,6 +1368,149 @@ function switchResultTab(btn, tabId) {
   document.querySelectorAll('.result-tab-content').forEach(t => t.style.display = 'none');
   document.getElementById(tabId).style.display = 'block';
 }
+
+// PNL LINE CHART
+let pnlChartInstance = null;
+let pnlChartData = {'1d': null, '7d': null, '30d': null};
+
+function buildPnlChartData(trades, sigs, period) {
+  if (!trades || trades.length === 0) return null;
+  const now = Date.now() / 1000;
+  const periods = {'1d': 86400, '7d': 604800, '30d': 2592000};
+  const buckets = {'1d': 24, '7d': 7, '30d': 30};
+  const cutoff = now - periods[period];
+  const bucketCount = buckets[period];
+  const bucketSize = periods[period] / bucketCount;
+
+  // Build cumulative PnL over time from trades
+  const bucketPnl = new Array(bucketCount).fill(0);
+  let cumulative = 0;
+  const cumulativePnl = new Array(bucketCount).fill(null);
+
+  // Use sigs timestamps with trade pnl values
+  const sellTrades = trades.filter(t => t.type === 'SELL' && t.pnlNum !== 0);
+  sellTrades.forEach((t, i) => {
+    const sig = sigs[i] || sigs[sigs.length - 1];
+    if (!sig) return;
+    const idx = Math.floor((sig.blockTime - cutoff) / bucketSize);
+    if (idx >= 0 && idx < bucketCount) {
+      bucketPnl[idx] += t.pnlNum;
+    }
+  });
+
+  // Build cumulative line
+  let running = 0;
+  for (let i = 0; i < bucketCount; i++) {
+    running += bucketPnl[i];
+    cumulativePnl[i] = parseFloat(running.toFixed(2));
+  }
+
+  const labelArr = [];
+  for (let i = 0; i < bucketCount; i++) {
+    if (period === '1d') labelArr.push(i + 'h');
+    else if (period === '7d') {
+      const d = new Date((cutoff + i * bucketSize) * 1000);
+      labelArr.push(d.toLocaleDateString('en', {weekday: 'short'}));
+    } else {
+      const d = new Date((cutoff + i * bucketSize) * 1000);
+      labelArr.push(d.toLocaleDateString('en', {month: 'short', day: 'numeric'}));
+    }
+  }
+
+  const maxPnl = Math.max(...cumulativePnl);
+  const minPnl = Math.min(...cumulativePnl);
+  const netPnl = cumulativePnl[cumulativePnl.length - 1];
+  const firstHalf = cumulativePnl.slice(0, Math.floor(bucketCount/2));
+  const secondHalf = cumulativePnl.slice(Math.floor(bucketCount/2));
+  const trend = secondHalf[secondHalf.length-1] > firstHalf[firstHalf.length-1] ? '↑ Rising' : '↓ Falling';
+
+  return { cumulativePnl, labelArr, maxPnl, minPnl, netPnl, trend };
+}
+
+function renderPnlChart(period) {
+  const data = pnlChartData[period];
+  if (!data) return;
+
+  const ctx = document.getElementById('pnlChart').getContext('2d');
+  if (pnlChartInstance) pnlChartInstance.destroy();
+
+  const isPositive = data.netPnl >= 0;
+  const lineColor = isPositive ? '#00d68f' : '#ff4d6a';
+  const fillColor = isPositive ? 'rgba(0,214,143,0.08)' : 'rgba(255,77,106,0.08)';
+
+  document.getElementById('pnlPeak').textContent = '+$' + data.maxPnl.toFixed(0);
+  document.getElementById('pnlLow').textContent = data.minPnl >= 0 ? '+$' + data.minPnl.toFixed(0) : '-$' + Math.abs(data.minPnl).toFixed(0);
+  document.getElementById('pnlNet').textContent = (data.netPnl >= 0 ? '+$' : '-$') + Math.abs(data.netPnl).toFixed(0);
+  document.getElementById('pnlNet').style.color = isPositive ? 'var(--green)' : 'var(--red)';
+  document.getElementById('pnlTrend').textContent = data.trend;
+  document.getElementById('pnlTrend').style.color = data.trend.includes('↑') ? 'var(--green)' : 'var(--red)';
+
+  pnlChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.labelArr,
+      datasets: [{
+        label: 'Cumulative PnL ($)',
+        data: data.cumulativePnl,
+        borderColor: lineColor,
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: lineColor,
+        fill: true,
+        backgroundColor: (context) => {
+          const chart = context.chart;
+          const {ctx: c, chartArea} = chart;
+          if (!chartArea) return fillColor;
+          const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          gradient.addColorStop(0, isPositive ? 'rgba(0,214,143,0.15)' : 'rgba(255,77,106,0.15)');
+          gradient.addColorStop(1, 'rgba(0,0,0,0)');
+          return gradient;
+        },
+        tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1d1f2a',
+          titleColor: '#e8eaf2',
+          bodyColor: 'rgba(232,234,242,0.7)',
+          borderColor: 'rgba(255,255,255,0.12)',
+          borderWidth: 1,
+          callbacks: {
+            label: (item) => ` PnL: ${item.raw >= 0 ? '+' : ''}$${item.raw.toFixed(0)}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: 'rgba(232,234,242,0.3)', font: { family: 'DM Mono', size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: 'rgba(232,234,242,0.3)',
+            font: { family: 'DM Mono', size: 10 },
+            callback: (v) => (v >= 0 ? '+$' : '-$') + Math.abs(v).toFixed(0)
+          }
+        }
+      }
+    }
+  });
+}
+
+function switchPnlChart(btn, period) {
+  document.querySelectorAll('#pnlChartBox .chart-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderPnlChart(period);
+}
+
 buildLeaderboard();
 }
 
@@ -1519,6 +1681,9 @@ function resetAnalyzer(){
   document.getElementById('walletInput').value='';
   document.getElementById('analyzeBtn').disabled=false;
   document.getElementById('chartBox').style.display='none';
+  const pnlBox=document.getElementById('pnlChartBox');if(pnlBox)pnlBox.style.display='none';
+  if(pnlChartInstance){pnlChartInstance.destroy();pnlChartInstance=null;}
+  pnlChartData={'1d':null,'7d':null,'30d':null};
   document.getElementById('intelGrid').style.display='none';
   document.getElementById('sentimentBox').style.display='none';
   document.getElementById('extLinks').style.display='none';
@@ -1855,30 +2020,94 @@ function buildFallback(onChain){
 }
 
 function renderResults(data,addr,onChain){
+  // Reset tabs to Overview
+  document.querySelectorAll('.result-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.querySelectorAll('.result-tab-content').forEach((t,i)=>t.style.display=i===0?'block':'none');
+
+  // TX count badge
   document.getElementById('txCountBadge').textContent=onChain?onChain.totalTxns:0;
-  const chainCfg = CHAINS[activeChain];
-  const liveBadge = document.querySelector('.live-badge');
-  if(liveBadge) {
-    liveBadge.innerHTML = `<span style="color:${chainCfg.color};">●</span> LIVE ${chainCfg.name.toUpperCase()} DATA — <span id="txCountBadge">${onChain?onChain.totalTxns:0}</span> transactions analyzed`;
-  }
-  const circ=175.9;
+
+  // Wallet header
+  const initials=addr.slice(0,2).toUpperCase();
+  const av=document.getElementById('walletAvatar');
+  if(av)av.textContent=initials;
+  const copyBtn=document.getElementById('copyAddrBtn');
+  if(copyBtn)copyBtn.style.display='inline';
+  document.getElementById('walletName').textContent=addr.slice(0,6)+'...'+addr.slice(-6);
+  document.getElementById('walletAddr').textContent=addr;
+
+  // Balance
+  const bal=onChain?.solBalance||'—';
+  const unit=activeChain==='sol'?'SOL':'ETH';
+  const wbal=document.getElementById('walletBalance');
+  if(wbal){wbal.textContent=bal!=='—'?bal+' '+unit:'—';wbal.style.color='var(--text)';}
+  const wsub=document.getElementById('walletBalanceSub');
+  if(wsub)wsub.textContent=onChain?(onChain.totalTxns+' transactions · '+(onChain.ageInDays||0)+'d wallet age'):'';
+
+  // Score ring (r=33, circ=207.3)
   const arc=document.getElementById('scoreArc');
   arc.style.stroke=data.scoreColor;
-  arc.style.strokeDashoffset=circ-(data.score/100)*circ;
+  arc.style.strokeDashoffset=207.3-(data.score/100)*207.3;
   document.getElementById('scoreDisplay').textContent=data.score;
   document.getElementById('scoreDisplay').style.color=data.scoreColor;
-  document.getElementById('walletName').textContent=addr.slice(0,4)+'...'+addr.slice(-4);
-  document.getElementById('walletAddr').textContent=addr.slice(0,22)+'...';
+
+  // Verdict pill
   const vp=document.getElementById('verdictPill');
   vp.textContent=data.verdict;vp.className='verdict-pill '+data.verdictClass;
+
+  // Overview verdict text
+  const ov=document.getElementById('overviewVerdict');
+  if(ov){ov.textContent=data.verdict;ov.style.color=data.scoreColor;}
+  const ovs=document.getElementById('overviewVerdictSub');
+  if(ovs)ovs.textContent=data.score>=72?'High confidence copy candidate.':data.score>=52?'Watch this wallet — verify before copying.':'Low score — avoid copying right now.';
+
+  // Win rate card
+  const wr=onChain?.winRate||parseInt(data.metrics?.[0]?.value)||50;
+  const wrEl=document.getElementById('overviewWinRate');
+  if(wrEl){wrEl.textContent=wr+'%';wrEl.style.color=wr>=65?'var(--green)':wr>=50?'var(--amber)':'var(--red)';}
+  const wrf=document.getElementById('winRateFill');
+  if(wrf){wrf.style.width=wr+'%';wrf.style.background=wr>=65?'var(--green)':wr>=50?'var(--amber)':'var(--red)';}
+  const wrsub=document.getElementById('overviewWinRateSub');
+  if(wrsub)wrsub.textContent=onChain?(onChain.successTxns+' successful / '+onChain.totalTxns+' total'):'Based on transaction analysis';
+
+  // PnL summary
+  const tp=onChain?.totalPnl||0;
+  const pnlEl=document.getElementById('ovPnlTotal');
+  if(pnlEl){pnlEl.textContent=tp>=0?'+$'+Math.abs(tp).toFixed(0):'-$'+Math.abs(tp).toFixed(0);pnlEl.style.color=tp>=0?'var(--green)':'var(--red)';}
+  const bestEl=document.getElementById('ovPnlBest');
+  if(bestEl)bestEl.textContent=onChain?.bestTrade?'+$'+onChain.bestTrade.toFixed(0):'—';
+  const worstEl=document.getElementById('ovPnlWorst');
+  if(worstEl)worstEl.textContent=onChain?.worstTrade?'-$'+Math.abs(onChain.worstTrade).toFixed(0):'—';
+  const avgPnl=onChain?.completedTrades?.length?tp/onChain.completedTrades.length:0;
+  const avgEl=document.getElementById('ovPnlAvg');
+  if(avgEl){avgEl.textContent=avgPnl!==0?(avgPnl>=0?'+$'+avgPnl.toFixed(0):'-$'+Math.abs(avgPnl).toFixed(0)):'—';avgEl.style.color=avgPnl>=0?'var(--green)':'var(--red)';}
+
+  // Risk signals
+  const rugPct=onChain?Math.min(99,Math.round((onChain.failedTxns/Math.max(1,onChain.totalTxns))*100)):0;
+  const riskEl=document.getElementById('riskRows');
+  if(riskEl)riskEl.innerHTML=`
+    <div class="risk-row"><span class="risk-row-label">Failed Txns</span><span class="risk-row-val" style="color:${rugPct>20?'var(--red)':rugPct>10?'var(--amber)':'var(--green)'}">${rugPct}%</span></div>
+    <div class="risk-row"><span class="risk-row-label">Copy Pattern</span><span class="risk-row-val" style="color:${onChain?.isCopyTrader?'var(--amber)':'var(--green)'}">${onChain?.isCopyTrader?'Detected':'Not detected'}</span></div>
+    <div class="risk-row"><span class="risk-row-label">Wallet Age</span><span class="risk-row-val" style="color:${(onChain?.ageInDays||0)>30?'var(--green)':(onChain?.ageInDays||0)>7?'var(--amber)':'var(--red)'}">${onChain?.ageInDays||'—'}d</span></div>
+    <div class="risk-row"><span class="risk-row-label">Recency</span><span class="risk-row-val" style="color:${(onChain?.recentActivity||0)>5?'var(--green)':'var(--amber)'}">${onChain?.recencyLabel||'—'}</span></div>`;
+
+  // Metrics strip
   document.getElementById('metricsGrid').innerHTML=data.metrics.map(m=>`<div class="metric-tile"><div class="m-label">${m.label}</div><div class="m-value ${m.color}">${m.value}</div></div>`).join('');
+
+  // Bot config
   document.getElementById('configGrid').innerHTML=Object.entries(data.config).map(([k,v])=>`<div class="config-item"><div class="config-key">${k}</div><div class="config-val">${v}</div></div>`).join('');
+
+  // AI report
   document.getElementById('aiBody').innerHTML=data.analysis.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+
+  // Timestamp
   document.getElementById('resultTs').textContent='Live analysis · '+new Date().toLocaleTimeString()+' · walletlens.dev';
 
-  // External platform links
-  const configTag = document.getElementById('configChainTag');
-  if(configTag) configTag.textContent = 'Banana Gun · ' + CHAINS[activeChain].name;
+  // Chain tag
+  const ct=document.getElementById('configChainTag');
+  if(ct)ct.textContent='Banana Gun · '+CHAINS[activeChain].name;
+
+  // External links
   const extBar=document.getElementById('extLinks');
   if(extBar){
     extBar.style.display='flex';
@@ -1906,63 +2135,13 @@ function renderResults(data,addr,onChain){
     document.getElementById('extCielo').href='https://app.cielo.finance/profile/'+addr+'/pnl/tokens';
   }
 
-  // INTELLIGENCE CARDS
-  if(onChain){
-    document.getElementById('intelGrid').style.display='grid';
-
-    // Copy pattern signal
-    const ctConf = onChain.copyTraderConfidence||0;
-    const isCopy = onChain.isCopyTrader;
-    document.getElementById('copyTraderVal').textContent = isCopy ? 'Copy Pattern' : 'Original';
-    document.getElementById('copyTraderVal').style.color = isCopy ? 'var(--amber)' : 'var(--green)';
-    document.getElementById('copyTraderSub').textContent = isCopy
-      ? 'Uniform trade timing detected. May be mirroring another wallet — verify before copying.'
-      : 'Organic trade timing. Likely generating own signals.';
-    const ctPill = document.getElementById('copyTraderPill');
-    ctPill.textContent = isCopy ? '⚠ ~' + ctConf + '% signal strength' : '✓ Timing looks organic';
-    ctPill.className = 'intel-pill ' + (isCopy ? 'amber' : 'green');
-
-    // Hold time
-    document.getElementById('holdTimeVal').textContent = onChain.holdTimeStr||'—';
-    document.getElementById('holdTimeSub').textContent = 'Avg time between buys and sells';
-    const htPill = document.getElementById('holdTimePill');
-    const ht = onChain.avgHoldMins||0;
-    htPill.textContent = ht<5?'⚡ Sniper — bot speed required':ht<30?'🔥 Scalper — fast execution':ht<120?'📈 Swing — manageable':'💎 Holder — easy to follow';
-    htPill.className = 'intel-pill '+(ht<5?'red':ht<30?'amber':ht<120?'green':'blue');
-
-    // Recency score
-    const rs = onChain.recencyScore||0;
-    document.getElementById('recencyVal').textContent = rs+'/100';
-    document.getElementById('recencyVal').style.color = rs>70?'var(--green)':rs>40?'var(--amber)':rs>0?'var(--red)':'var(--muted)';
-    document.getElementById('recencySub').textContent = (onChain.last24h||0)+' txns (24h) · '+(onChain.last48h||0)+' txns (48h) · '+(onChain.recentActivity||0)+' txns (7d)';
-    const rPill = document.getElementById('recencyPill');
-    rPill.textContent = onChain.recencyLabel||'—';
-    rPill.className = 'intel-pill '+(rs>70?'green':rs>40?'amber':rs>0?'red':'red');
-
-    // Trader style
-    const style = onChain.traderStyle||'Unknown';
-    document.getElementById('styleVal').textContent = style;
-    document.getElementById('styleVal').style.color = '#a78bfa';
-    const styleDescs = {
-      'Sniper':'Buys within seconds of launch. Need fastest possible gas.',
-      'Scalper':'Quick in and out. Set tight stop loss, fast gas.',
-      'Swing':'Holds minutes to hours. Comfortable copy trading pace.',
-      'Holder':'Patient trader. Easy to follow, lower gas needed.'
-    };
-    document.getElementById('styleSub').textContent = styleDescs[style]||'Analyzing pattern...';
-    const sPill = document.getElementById('stylePill');
-    sPill.textContent = style==='Sniper'?'⚡ Max gas required':style==='Scalper'?'🔥 High gas recommended':style==='Swing'?'✓ Standard settings':'✓ Low gas ok';
-    sPill.className = 'intel-pill '+(style==='Sniper'?'red':style==='Scalper'?'amber':'green');
-  }
-
-  // TRADE HISTORY
+  // Trade history (inside Trade History tab)
   if(onChain&&onChain.trades){
-    const tbody=document.getElementById('tradesBody');
-    // Known rug tokens (simplified list)
     const RUG_TOKENS=['SLERF','BOME','MYRO','FLOKI','NEIRO','SAMO'];
+    const tbody=document.getElementById('tradesBody');
     tbody.innerHTML=onChain.trades.map(t=>{
-      const isRug = RUG_TOKENS.includes(t.token) && t.pnlNum < 0;
-      const flag = isRug ? '<span style="font-size:0.62rem;color:var(--red);background:rgba(255,77,106,0.1);border:1px solid rgba(255,77,106,0.2);padding:2px 6px;border-radius:4px;">RUG</span>' : '<span style="font-size:0.62rem;color:var(--muted2);">—</span>';
+      const isRug=RUG_TOKENS.includes(t.token)&&t.pnlNum<0;
+      const flag=isRug?'<span style="font-size:0.62rem;color:var(--red);background:rgba(255,77,106,0.1);border:1px solid rgba(255,77,106,0.2);padding:2px 6px;border-radius:4px;">RUG</span>':'<span style="font-size:0.62rem;color:var(--muted2);">—</span>';
       return `<tr>
         <td style="color:var(--muted);">${t.time}</td>
         <td><span class="trade-type-${t.type.toLowerCase()}">${t.type}</span></td>
@@ -1973,25 +2152,38 @@ function renderResults(data,addr,onChain){
         <td>${flag}</td>
       </tr>`;
     }).join('');
-    const tp=onChain.totalPnl;
-    document.getElementById('totalPnl').textContent=(tp>=0?'+$'+tp.toFixed(0):'-$'+Math.abs(tp).toFixed(0));
-    document.getElementById('totalPnl').className='ts-val '+(tp>=0?'c-green':'c-red');
+    const tp2=onChain.totalPnl;
+    document.getElementById('totalPnl').textContent=(tp2>=0?'+$'+tp2.toFixed(0):'-$'+Math.abs(tp2).toFixed(0));
+    document.getElementById('totalPnl').className='ts-val '+(tp2>=0?'c-green':'c-red');
     document.getElementById('tradeWinRate').textContent=onChain.tradeWinRate+'%';
     document.getElementById('bestTrade').textContent='+$'+onChain.bestTrade.toFixed(0);
     document.getElementById('worstTrade').textContent='-$'+Math.abs(onChain.worstTrade).toFixed(0);
-    document.getElementById('tradesBox').style.display='block';
   }
 
-  // CHART
+  // Sentiment + speed (Analytics tab)
+  renderSentimentAndSpeed(onChain);
+
+  // Activity chart
   if(rawSigs.length>0){
     chartData['1d']=buildChartData(rawSigs,'1d');
     chartData['7d']=buildChartData(rawSigs,'7d');
     chartData['30d']=buildChartData(rawSigs,'30d');
     document.getElementById('chartBox').style.display='block';
-    document.querySelectorAll('.chart-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+    document.querySelectorAll('#chartBox .chart-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
     setTimeout(()=>renderChart('1d'),100);
   }
+
+  // PnL line chart
+  if(onChain&&onChain.trades&&onChain.trades.length>0){
+    pnlChartData['1d']=buildPnlChartData(onChain.trades,rawSigs,'1d');
+    pnlChartData['7d']=buildPnlChartData(onChain.trades,rawSigs,'7d');
+    pnlChartData['30d']=buildPnlChartData(onChain.trades,rawSigs,'30d');
+    document.getElementById('pnlChartBox').style.display='block';
+    document.querySelectorAll('#pnlChartBox .chart-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+    setTimeout(()=>renderPnlChart('1d'),150);
+  }
 }
+
 
 function buildChartData(sigs,period){
   const now=Date.now()/1000;
