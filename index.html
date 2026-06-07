@@ -628,6 +628,13 @@ async function fetchOnChainData(wallet){
 }
 
 async function runAnalysis(){
+  // Clear previous results
+  document.getElementById('chartBox').style.display='none';
+  document.getElementById('tradesBox').style.display='none';
+  document.getElementById('results').classList.remove('show');
+  if(chartInstance){chartInstance.destroy();chartInstance=null;}
+  rawSigs=[];chartData={'1d':null,'7d':null,'30d':null};
+  ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id=>{const el=document.getElementById(id);el.classList.remove('active','done');});
   const addr=document.getElementById('walletInput').value.trim();
   if(!addr||addr.length<32){
     const inp=document.getElementById('walletInput');
@@ -654,6 +661,8 @@ async function runAnalysis(){
   document.getElementById('loadingState').classList.remove('show');
   renderResults(report,addr,onChain);
   document.getElementById('results').classList.add('show');
+  document.getElementById('analyzeBtn').disabled=false;
+  document.getElementById('analyzeBtn').textContent='Analyze →';
 }
 
 async function generateAIReport(wallet,onChain){
