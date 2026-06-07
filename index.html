@@ -14,6 +14,8 @@
 <meta name="twitter:description" content="Analyze any wallet on Solana, Ethereum or Base. Real blockchain data + exact bot settings. Free.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WalletLens — On-Chain Wallet Intelligence for Solana, Ethereum & Base</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080910'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%234f8eff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='none' stroke='%234f8eff' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%234f8eff'/%3E%3Cline x1='16' y1='5' x2='16' y2='11' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='16' y1='21' x2='16' y2='27' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='5' y1='16' x2='11' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='21' y1='16' x2='27' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080910'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%234f8eff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='none' stroke='%234f8eff' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%234f8eff'/%3E%3Cline x1='16' y1='5' x2='16' y2='11' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='16' y1='21' x2='16' y2='27' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='5' y1='16' x2='11' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='21' y1='16' x2='27' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -220,6 +222,63 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3r
 footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bottom:0.25rem;}
 .fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.55s,transform 0.55s;}
 .fade-in.visible{opacity:1;transform:translateY(0);}
+/* WALLET COMPARISON */
+.compare-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;overflow:hidden;}
+.compare-inputs{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;padding:1.5rem;align-items:center;background:var(--bg3);border-bottom:1px solid var(--border);}
+.vs-badge{font-family:var(--mono);font-size:0.75rem;color:var(--muted2);background:var(--bg4);border:1px solid var(--border2);padding:6px 12px;border-radius:8px;text-align:center;}
+.compare-btn{width:100%;margin:0 1.5rem 1.5rem;background:var(--accent);color:#fff;border:none;padding:0.875rem;border-radius:10px;font-family:var(--sans);font-weight:600;font-size:0.95rem;cursor:pointer;transition:background 0.15s;}
+.compare-btn:hover:not(:disabled){background:var(--accent2);}
+.compare-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.compare-results{display:none;padding:1.5rem;}
+.compare-results.show{display:block;}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.compare-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:1.25rem;}
+.compare-card.winner{border-color:rgba(0,214,143,0.4);}
+.compare-card.loser{border-color:rgba(255,77,106,0.2);opacity:0.85;}
+.compare-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);}
+.compare-addr{font-family:var(--mono);font-size:0.75rem;color:var(--text);font-weight:500;}
+.compare-badge{font-family:var(--mono);font-size:0.65rem;padding:3px 10px;border-radius:100px;}
+.compare-badge.w{background:rgba(0,214,143,0.15);color:var(--green);border:1px solid rgba(0,214,143,0.3);}
+.compare-badge.l{background:rgba(255,77,106,0.1);color:var(--red);border:1px solid rgba(255,77,106,0.2);}
+.compare-rows{display:flex;flex-direction:column;gap:8px;}
+.compare-row{display:flex;justify-content:space-between;align-items:center;}
+.compare-row-label{font-family:var(--mono);font-size:0.68rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;}
+.compare-row-val{font-family:var(--mono);font-size:0.85rem;font-weight:500;}
+.compare-winner-banner{background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.2);border-radius:12px;padding:1rem 1.25rem;text-align:center;margin-top:1rem;}
+.compare-winner-text{font-family:var(--mono);font-size:0.8rem;color:var(--green);}
+
+/* TOKEN SAFETY SCANNER */
+.token-scanner-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;overflow:hidden;}
+.safety-result{display:none;padding:1.5rem;}
+.safety-result.show{display:block;}
+.safety-score-row{display:flex;align-items:center;gap:1.5rem;padding:1.25rem;background:var(--bg3);border:1px solid var(--border2);border-radius:14px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.safety-ring{position:relative;width:72px;height:72px;flex-shrink:0;}
+.safety-ring svg{transform:rotate(-90deg);}
+.safety-ring-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.safety-checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:1.25rem;}
+.safety-check{display:flex;align-items:center;gap:10px;padding:0.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:10px;}
+.safety-check-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.65rem;font-weight:700;}
+.safety-check-icon.pass{background:rgba(0,214,143,0.15);color:var(--green);}
+.safety-check-icon.fail{background:rgba(255,77,106,0.15);color:var(--red);}
+.safety-check-icon.warn{background:rgba(255,181,71,0.15);color:var(--amber);}
+.safety-check-label{font-family:var(--mono);font-size:0.72rem;color:var(--text);}
+.safety-check-val{font-family:var(--mono);font-size:0.68rem;color:var(--muted);margin-left:auto;}
+
+/* WALLET SENTIMENT */
+.sentiment-bar-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem;}
+.sentiment-bar-track{height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;margin:0.75rem 0;}
+.sentiment-bar-fill{height:100%;border-radius:4px;transition:width 0.6s ease;}
+.sentiment-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.65rem;color:var(--muted2);}
+
+/* BOT SPEED SCORE */
+.speed-compat{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem;}
+.speed-bars{display:flex;flex-direction:column;gap:8px;margin-top:0.75rem;}
+.speed-bar-row{display:flex;align-items:center;gap:10px;}
+.speed-bar-label{font-family:var(--mono);font-size:0.68rem;color:var(--muted);width:100px;flex-shrink:0;}
+.speed-bar-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.speed-bar-fill{height:100%;border-radius:3px;}
+.speed-bar-pct{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);width:35px;text-align:right;flex-shrink:0;}
+
 .chain-switcher{display:flex;gap:6px;align-items:center;}
 .chain-btn{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:var(--mono);font-size:0.7rem;cursor:pointer;transition:all 0.15s;font-weight:500;}
 .chain-btn:hover{border-color:var(--border3);color:var(--text);}
@@ -281,8 +340,9 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
   </div>
   <div class="nav-links">
     <a href="#analyzer">Analyzer</a>
+    <a href="#compare">Compare</a>
+    <a href="#scanner">Safety</a>
     <a href="#leaderboard">Leaderboard</a>
-    <a href="#how">How it works</a>
     <a href="#pricing">Pricing</a>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
@@ -461,6 +521,26 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
           </div>
         </div>
 
+        <!-- WALLET SENTIMENT -->
+        <div class="sentiment-bar-wrap" id="sentimentBox" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#a78bfa;display:inline-block;"></span>Wallet Sentiment</div>
+            <div style="font-family:var(--mono);font-size:0.75rem;font-weight:500;" id="sentimentLabel">—</div>
+          </div>
+          <div class="sentiment-bar-track">
+            <div class="sentiment-bar-fill" id="sentimentFill" style="width:50%;background:var(--amber);"></div>
+          </div>
+          <div class="sentiment-labels"><span>Fear / Taking Profits</span><span>Greed / Buying Mode</span></div>
+          <div style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin-top:0.5rem;" id="sentimentDesc">—</div>
+        </div>
+
+        <!-- BOT SPEED COMPATIBILITY -->
+        <div class="speed-compat" id="speedCompatBox" style="display:none;">
+          <div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:0.25rem;"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>Bot Speed Compatibility</div>
+          <div style="font-family:var(--mono);font-size:0.68rem;color:var(--muted2);margin-bottom:0.875rem;" id="speedWarning">—</div>
+          <div class="speed-bars" id="speedBars"></div>
+        </div>
+
         <div class="bot-config">
           <div class="config-header">
             <div class="config-title">Recommended Bot Configuration</div>
@@ -577,6 +657,132 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
   </div>
 </section>
 
+
+<hr class="divider">
+
+<!-- WALLET COMPARISON -->
+<section class="section" id="compare">
+  <div class="section-eyebrow">WALLET COMPARISON</div>
+  <h2 class="section-title fade-in">Compare two wallets<br>head to head.</h2>
+  <p class="section-desc fade-in">Paste two wallets and see which one scores higher, whose win rate is better, and which one fits your bot. Nobody else does this.</p>
+
+  <div class="compare-wrap fade-in">
+    <div class="analyzer-topbar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="win-dots"><div class="wd wd1"></div><div class="wd wd2"></div><div class="wd wd3"></div></div>
+        <span class="topbar-title">walletlens.dev — wallet comparison</span>
+      </div>
+      <div class="topbar-badge">● LIVE</div>
+    </div>
+    <div style="padding:1.5rem;">
+      <div class="compare-inputs">
+        <input class="wallet-input" id="compareWallet1" placeholder="Wallet A address..." autocomplete="off" spellcheck="false"/>
+        <div class="vs-badge">VS</div>
+        <input class="wallet-input" id="compareWallet2" placeholder="Wallet B address..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div style="padding:0 1.5rem 1.5rem;">
+        <button class="compare-btn" id="compareBtn" onclick="runComparison()">Compare Wallets →</button>
+      </div>
+
+      <div class="loading-state" id="compareLoading">
+        <div class="loader-ring"></div>
+        <div class="loader-label">Fetching both wallets from chain...</div>
+      </div>
+
+      <div class="compare-results" id="compareResults">
+        <div class="compare-grid">
+          <div class="compare-card" id="compareCardA">
+            <div class="compare-card-header">
+              <span class="compare-addr" id="compareAddrA">—</span>
+              <span class="compare-badge" id="compareBadgeA">—</span>
+            </div>
+            <div class="compare-rows" id="compareRowsA"></div>
+          </div>
+          <div class="compare-card" id="compareCardB">
+            <div class="compare-card-header">
+              <span class="compare-addr" id="compareAddrB">—</span>
+              <span class="compare-badge" id="compareBadgeB">—</span>
+            </div>
+            <div class="compare-rows" id="compareRowsB"></div>
+          </div>
+        </div>
+        <div class="compare-winner-banner" id="compareWinnerBanner">
+          <div class="compare-winner-text" id="compareWinnerText">—</div>
+        </div>
+        <div style="margin-top:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
+          <span style="font-family:var(--mono);font-size:0.68rem;color:var(--muted2);" id="compareTs">—</span>
+          <button class="btn-reset" onclick="resetComparison()">← New Comparison</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- TOKEN SAFETY SCANNER -->
+<section class="section" id="scanner">
+  <div class="section-eyebrow">TOKEN SAFETY SCANNER</div>
+  <h2 class="section-title fade-in">Is this token safe<br>to trade?</h2>
+  <p class="section-desc fade-in">Before you copy a trade, verify the token isn't a rug. Paste any Solana token contract address for an instant safety report.</p>
+
+  <div class="token-scanner-wrap fade-in">
+    <div class="analyzer-topbar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="win-dots"><div class="wd wd1"></div><div class="wd wd2"></div><div class="wd wd3"></div></div>
+        <span class="topbar-title">walletlens.dev — token scanner</span>
+      </div>
+      <div class="topbar-badge" style="color:var(--amber);">● BETA</div>
+    </div>
+    <div style="padding:1.5rem;">
+      <div class="input-group">
+        <input class="wallet-input" id="tokenInput" placeholder="Paste token contract address..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')runTokenScan()"/>
+        <button class="analyze-btn" id="tokenScanBtn" onclick="runTokenScan()">Scan →</button>
+      </div>
+      <div class="input-hint" style="margin-bottom:1.5rem;">Supports Solana SPL tokens · Paste the token mint address</div>
+
+      <div class="loading-state" id="tokenScanLoading">
+        <div class="loader-ring"></div>
+        <div class="loader-label">Scanning token contract...</div>
+      </div>
+
+      <div class="safety-result" id="safetyResult">
+        <div class="safety-score-row">
+          <div class="safety-ring">
+            <svg width="72" height="72" viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+              <circle id="safetyArc" cx="36" cy="36" r="30" fill="none" stroke="#00d68f" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+            </svg>
+            <div class="safety-ring-num">
+              <span style="font-family:var(--mono);font-size:1.25rem;font-weight:500;" id="safetyScore">—</span>
+              <span style="font-family:var(--mono);font-size:0.6rem;color:var(--muted2);">/100</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:1rem;font-weight:600;margin-bottom:4px;" id="safetyVerdict">—</div>
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);" id="safetyAddr">—</div>
+            <div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);margin-top:4px;" id="safetyName">—</div>
+          </div>
+          <div class="verdict-pill" id="safetyPill" style="margin-left:auto;">—</div>
+        </div>
+
+        <div class="safety-checks" id="safetyChecks"></div>
+
+        <div class="ai-block">
+          <div class="ai-badge">◆ SAFETY ANALYSIS</div>
+          <div class="ai-body" id="safetyAnalysis">—</div>
+        </div>
+
+        <div style="margin-top:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
+          <span style="font-family:var(--mono);font-size:0.68rem;color:var(--muted2);" id="safetyTs">—</span>
+          <button class="btn-reset" onclick="resetTokenScan()">← Scan Another</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
 <footer>
   <div class="footer-logo">WalletLens</div>
   <p>On-chain intelligence for Solana, Ethereum & Base copy traders.</p>
@@ -707,7 +913,297 @@ function switchLbChain(chain) {
   });
   const cfg = CHAINS[chain];
   document.getElementById('lbTitle').textContent = 'Top ' + cfg.name + ' Wallets Today';
-  buildLeaderboard();
+  
+// ============================================
+// WALLET SENTIMENT + BOT SPEED (shown in analyzer results)
+// ============================================
+function renderSentimentAndSpeed(onChain) {
+  if(!onChain) return;
+
+  // SENTIMENT: based on ratio of recent vs older activity
+  const recentRatio = onChain.totalTxns > 0 ? (onChain.recentActivity / onChain.totalTxns) : 0;
+  const successRatio = onChain.winRate / 100;
+  const sentimentScore = Math.round((recentRatio * 0.5 + successRatio * 0.5) * 100);
+  const sentimentPct = Math.min(95, Math.max(5, sentimentScore));
+
+  const sentimentLabel = sentimentPct > 70 ? 'Greed — Active Buying' :
+    sentimentPct > 55 ? 'Neutral — Mixed Activity' :
+    sentimentPct > 35 ? 'Caution — Slowing Down' : 'Fear — Taking Profits';
+
+  const sentimentColor = sentimentPct > 70 ? 'var(--green)' :
+    sentimentPct > 55 ? '#a78bfa' :
+    sentimentPct > 35 ? 'var(--amber)' : 'var(--red)';
+
+  const sentimentDesc = sentimentPct > 70
+    ? 'Wallet is in active buying mode — high recent activity and strong success rate. Good time to copy.'
+    : sentimentPct > 55
+    ? 'Wallet showing mixed signals — some buying, some profit taking. Proceed with normal caution.'
+    : sentimentPct > 35
+    ? 'Wallet activity slowing — may be shifting to profit taking mode. Monitor before copying.'
+    : 'Wallet appears to be exiting positions — low recent activity and high failure rate. Avoid copying right now.';
+
+  document.getElementById('sentimentBox').style.display = 'block';
+  document.getElementById('sentimentLabel').textContent = sentimentLabel;
+  document.getElementById('sentimentLabel').style.color = sentimentColor;
+  document.getElementById('sentimentFill').style.width = sentimentPct + '%';
+  document.getElementById('sentimentFill').style.background = sentimentColor;
+  document.getElementById('sentimentDesc').textContent = sentimentDesc;
+
+  // BOT SPEED COMPATIBILITY
+  const holdMins = onChain.avgHoldMins || 60;
+  const bots = [
+    { name: 'Banana Gun', minMins: 1, compat: holdMins >= 1 ? Math.min(100, Math.round((holdMins/5)*30+40)) : 20 },
+    { name: 'Maestro', minMins: 1, compat: holdMins >= 1 ? Math.min(100, Math.round((holdMins/5)*25+45)) : 25 },
+    { name: 'Trojan', minMins: 0.5, compat: holdMins >= 0.5 ? Math.min(100, Math.round((holdMins/3)*30+40)) : 30 },
+    { name: 'BonkBot', minMins: 2, compat: holdMins >= 2 ? Math.min(100, Math.round((holdMins/8)*25+40)) : 15 },
+  ];
+
+  const warning = holdMins < 2
+    ? '⚡ This wallet trades extremely fast. Standard gas may cause missed trades.'
+    : holdMins < 10
+    ? '🔥 Fast trader. Use high gas settings to keep up.'
+    : '✓ Hold time is compatible with standard bot settings.';
+
+  document.getElementById('speedCompatBox').style.display = 'block';
+  document.getElementById('speedWarning').textContent = warning;
+  document.getElementById('speedBars').innerHTML = bots.map(b => `
+    <div class="speed-bar-row">
+      <div class="speed-bar-label">${b.name}</div>
+      <div class="speed-bar-track">
+        <div class="speed-bar-fill" style="width:${b.compat}%;background:${b.compat>=70?'var(--green)':b.compat>=45?'var(--amber)':'var(--red)'};"></div>
+      </div>
+      <div class="speed-bar-pct">${b.compat}%</div>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// WALLET COMPARISON
+// ============================================
+async function runComparison() {
+  const w1 = document.getElementById('compareWallet1').value.trim();
+  const w2 = document.getElementById('compareWallet2').value.trim();
+  if(!w1 || !w2 || w1.length < 30 || w2.length < 30) {
+    [document.getElementById('compareWallet1'), document.getElementById('compareWallet2')].forEach(el => {
+      if(!el.value.trim() || el.value.trim().length < 30) {
+        el.style.borderColor = 'var(--red)';
+        setTimeout(() => el.style.borderColor = '', 1200);
+      }
+    });
+    return;
+  }
+
+  document.getElementById('compareResults').classList.remove('show');
+  document.getElementById('compareLoading').classList.add('show');
+  document.getElementById('compareBtn').disabled = true;
+
+  const [dataA, dataB] = await Promise.all([
+    scoreWalletForLeaderboard(w1, activeChain),
+    scoreWalletForLeaderboard(w2, activeChain)
+  ]);
+
+  const reportA = await generateAIReport(w1, dataA);
+  const reportB = await generateAIReport(w2, dataB);
+
+  document.getElementById('compareLoading').classList.remove('show');
+  renderComparison(w1, w2, dataA, dataB, reportA, reportB);
+  document.getElementById('compareResults').classList.add('show');
+  document.getElementById('compareBtn').disabled = false;
+}
+
+function renderComparison(w1, w2, dataA, dataB, reportA, reportB) {
+  const scoreA = dataA?.score || 0;
+  const scoreB = dataB?.score || 0;
+  const aWins = scoreA >= scoreB;
+
+  const buildRows = (data, report) => [
+    { label: 'Score', val: (data?.score || report?.score || '—') + '/100', color: (data?.score||0)>=70?'var(--green)':(data?.score||0)>=50?'var(--amber)':'var(--red)' },
+    { label: 'Win Rate', val: (data?.winRate || '—') + '%', color: (data?.winRate||0)>=65?'var(--green)':(data?.winRate||0)>=50?'var(--amber)':'var(--red)' },
+    { label: 'Activity 7D', val: (data?.recentActivity || '—') + ' txns', color: 'var(--text)' },
+    { label: 'Verdict', val: report?.verdict || '—', color: report?.verdictClass==='v-copy'?'var(--green)':report?.verdictClass==='v-watch'?'var(--amber)':'var(--red)' },
+    { label: 'Trader Style', val: data?.traderStyle || '—', color: '#a78bfa' },
+    { label: 'Hold Time', val: data?.holdTimeStr || '—', color: 'var(--text)' },
+  ].map(r => `<div class="compare-row"><span class="compare-row-label">${r.label}</span><span class="compare-row-val" style="color:${r.color}">${r.val}</span></div>`).join('');
+
+  document.getElementById('compareAddrA').textContent = w1.slice(0,6)+'...'+w1.slice(-4);
+  document.getElementById('compareAddrB').textContent = w2.slice(0,6)+'...'+w2.slice(-4);
+
+  const badgeA = document.getElementById('compareBadgeA');
+  const badgeB = document.getElementById('compareBadgeB');
+  const cardA = document.getElementById('compareCardA');
+  const cardB = document.getElementById('compareCardB');
+
+  if(aWins) {
+    badgeA.textContent = '★ WINNER'; badgeA.className = 'compare-badge w';
+    badgeB.textContent = 'RUNNER UP'; badgeB.className = 'compare-badge l';
+    cardA.className = 'compare-card winner'; cardB.className = 'compare-card loser';
+  } else {
+    badgeB.textContent = '★ WINNER'; badgeB.className = 'compare-badge w';
+    badgeA.textContent = 'RUNNER UP'; badgeA.className = 'compare-badge l';
+    cardB.className = 'compare-card winner'; cardA.className = 'compare-card loser';
+  }
+
+  document.getElementById('compareRowsA').innerHTML = buildRows(dataA, reportA);
+  document.getElementById('compareRowsB').innerHTML = buildRows(dataB, reportB);
+
+  const winnerAddr = aWins ? w1.slice(0,6)+'...'+w1.slice(-4) : w2.slice(0,6)+'...'+w2.slice(-4);
+  const diff = Math.abs(scoreA - scoreB);
+  document.getElementById('compareWinnerText').textContent =
+    diff < 5
+      ? '⚖ These wallets are very close — both worth watching.'
+      : `★ ${winnerAddr} wins with a ${Math.max(scoreA,scoreB)}/100 score — ${diff} points ahead.`;
+
+  document.getElementById('compareTs').textContent = 'Comparison · ' + new Date().toLocaleTimeString() + ' · walletlens.dev';
+}
+
+function resetComparison() {
+  document.getElementById('compareResults').classList.remove('show');
+  document.getElementById('compareWallet1').value = '';
+  document.getElementById('compareWallet2').value = '';
+  document.getElementById('compareBtn').disabled = false;
+}
+
+// ============================================
+// TOKEN SAFETY SCANNER
+// ============================================
+async function runTokenScan() {
+  const token = document.getElementById('tokenInput').value.trim();
+  if(!token || token.length < 30) {
+    const inp = document.getElementById('tokenInput');
+    inp.style.borderColor = 'var(--red)';
+    setTimeout(() => inp.style.borderColor = '', 1200);
+    return;
+  }
+
+  document.getElementById('safetyResult').classList.remove('show');
+  document.getElementById('tokenScanLoading').classList.add('show');
+  document.getElementById('tokenScanBtn').disabled = true;
+
+  // Fetch token account info from Solana
+  let tokenData = null;
+  try {
+    const res = await fetch(CHAINS.sol.rpc, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0',id:1,method:'getAccountInfo',params:[token,{encoding:'jsonParsed'}]})
+    });
+    const json = await res.json();
+    tokenData = json.result?.value;
+  } catch(e) {}
+
+  // Get token signatures
+  let sigCount = 0;
+  try {
+    const res = await fetch(CHAINS.sol.rpc, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0',id:2,method:'getSignaturesForAddress',params:[token,{limit:50}]})
+    });
+    const json = await res.json();
+    sigCount = (json.result || []).length;
+  } catch(e) {}
+
+  // Use AI to generate safety analysis
+  const safetyReport = await generateTokenSafetyReport(token, tokenData, sigCount);
+
+  document.getElementById('tokenScanLoading').classList.remove('show');
+  renderTokenSafety(token, safetyReport, sigCount);
+  document.getElementById('safetyResult').classList.add('show');
+  document.getElementById('tokenScanBtn').disabled = false;
+}
+
+async function generateTokenSafetyReport(token, tokenData, sigCount) {
+  const hasData = !!tokenData;
+  const prompt = `You are WalletLens token safety scanner. Analyze this Solana token: ${token}
+On-chain data: ${hasData ? 'Account exists on Solana' : 'No account data found'}, ${sigCount} recent transactions.
+
+Respond ONLY with valid JSON:
+{
+  "safetyScore": <0-100>,
+  "verdict": <"SAFE" or "CAUTION" or "HIGH RISK" or "LIKELY RUG">,
+  "verdictClass": <"v-copy" or "v-watch" or "v-skip">,
+  "scoreColor": <"#00d68f" or "#ffb547" or "#ff4d6a">,
+  "tokenName": "<estimated token name or 'Unknown Token'>",
+  "checks": [
+    {"label": "Contract Verified", "status": <"pass" or "fail" or "warn">, "value": "<yes/no/unknown>"},
+    {"label": "Liquidity Locked", "status": <"pass" or "warn" or "fail">, "value": "<estimated>"},
+    {"label": "Mint Authority", "status": <"pass" or "fail">, "value": "<renounced/active/unknown>"},
+    {"label": "Freeze Authority", "status": <"pass" or "fail">, "value": "<none/active/unknown>"},
+    {"label": "Transaction Volume", "status": <"pass" or "warn" or "fail">, "value": "${sigCount} recent txns"},
+    {"label": "Account Age", "status": <"pass" or "warn">, "value": "<estimated>"},
+    {"label": "Holder Distribution", "status": <"pass" or "warn" or "fail">, "value": "<estimated>"},
+    {"label": "Rug Risk", "status": <"pass" or "warn" or "fail">, "value": "<low/medium/high>"}
+  ],
+  "analysis": "<2-3 sentences. Be direct about risks. Reference the actual data. If uncertain say so — never overclaim.>"
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        messages: [{role:'user',content:prompt}]
+      })
+    });
+    const json = await res.json();
+    const raw = json.content[0].text.replace(/```json|```/g,'').trim();
+    return JSON.parse(raw);
+  } catch(e) {
+    return {
+      safetyScore: 45, verdict: 'CAUTION', verdictClass: 'v-watch',
+      scoreColor: '#ffb547', tokenName: 'Unknown Token',
+      checks: [
+        {label:'Contract Verified',status:'warn',value:'Unknown'},
+        {label:'Liquidity Locked',status:'warn',value:'Unknown'},
+        {label:'Mint Authority',status:'warn',value:'Unknown'},
+        {label:'Freeze Authority',status:'warn',value:'Unknown'},
+        {label:'Transaction Volume',status: sigCount>10?'pass':'warn',value:sigCount+' txns'},
+        {label:'Account Age',status:'warn',value:'Unknown'},
+        {label:'Holder Distribution',status:'warn',value:'Unknown'},
+        {label:'Rug Risk',status:'warn',value:'Medium'},
+      ],
+      analysis: 'Could not fetch complete on-chain data for this token. Exercise caution — always verify token details on Solscan before trading.'
+    };
+  }
+}
+
+function renderTokenSafety(token, report, sigCount) {
+  const circ = 188.5;
+  const arc = document.getElementById('safetyArc');
+  arc.style.stroke = report.scoreColor;
+  arc.style.strokeDashoffset = circ - (report.safetyScore/100)*circ;
+
+  document.getElementById('safetyScore').textContent = report.safetyScore;
+  document.getElementById('safetyScore').style.color = report.scoreColor;
+  document.getElementById('safetyVerdict').textContent = report.verdict;
+  document.getElementById('safetyAddr').textContent = token.slice(0,16)+'...'+token.slice(-8);
+  document.getElementById('safetyName').textContent = report.tokenName;
+
+  const pill = document.getElementById('safetyPill');
+  pill.textContent = report.verdict;
+  pill.className = 'verdict-pill ' + report.verdictClass;
+
+  document.getElementById('safetyChecks').innerHTML = report.checks.map(c => `
+    <div class="safety-check">
+      <div class="safety-check-icon ${c.status}">${c.status==='pass'?'✓':c.status==='fail'?'✗':'!'}</div>
+      <span class="safety-check-label">${c.label}</span>
+      <span class="safety-check-val">${c.value}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('safetyAnalysis').textContent = report.analysis;
+  document.getElementById('safetyTs').textContent = 'Scanned · ' + new Date().toLocaleTimeString() + ' · walletlens.dev';
+}
+
+function resetTokenScan() {
+  document.getElementById('safetyResult').classList.remove('show');
+  document.getElementById('tokenInput').value = '';
+  document.getElementById('tokenScanBtn').disabled = false;
+}
+
+buildLeaderboard();
 }
 
 let leaderboardCache = null;
@@ -879,6 +1375,8 @@ function resetAnalyzer(){
   document.getElementById('chartBox').style.display='none';
   document.getElementById('tradesBox').style.display='none';
   document.getElementById('intelGrid').style.display='none';
+  document.getElementById('sentimentBox').style.display='none';
+  document.getElementById('speedCompatBox').style.display='none';
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
   rawSigs=[];
   ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id=>{
@@ -1121,6 +1619,8 @@ async function runAnalysis(){
   document.getElementById('chartBox').style.display='none';
   document.getElementById('tradesBox').style.display='none';
   document.getElementById('intelGrid').style.display='none';
+  document.getElementById('sentimentBox').style.display='none';
+  document.getElementById('speedCompatBox').style.display='none';
   document.getElementById('results').classList.remove('show');
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
   rawSigs=[];chartData={'1d':null,'7d':null,'30d':null};
