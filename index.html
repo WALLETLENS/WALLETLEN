@@ -1117,7 +1117,7 @@ function switchChart(btn,period){
 
 
 // SECURITY & RATE LIMITING
-const DAILY_LIMIT = 3;
+const DAILY_LIMIT = 20;
 const STORAGE_KEY = 'wl_usage';
 const ADMIN_KEY = '716a50c2b2a81693';
 const ADMIN_STORAGE = 'wl_admin';
@@ -1221,7 +1221,7 @@ function toggleTooltip(id){
 
 buildLeaderboard();
 
-function joinWaitlist(){
+async function joinWaitlist(){
   const email = document.getElementById('waitlistEmail').value.trim();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if(!email || !emailRegex.test(email)){
@@ -1229,16 +1229,28 @@ function joinWaitlist(){
     setTimeout(()=>document.getElementById('waitlistEmail').style.borderColor='', 1500);
     return;
   }
-  // Store in localStorage
-  const waitlist = JSON.parse(localStorage.getItem('wl_waitlist') || '[]');
-  if(!waitlist.includes(email)){
-    waitlist.push(email);
-    localStorage.setItem('wl_waitlist', JSON.stringify(waitlist));
+  const btn = document.querySelector('[onclick="joinWaitlist()"]');
+  btn.textContent = 'Joining...';
+  btn.disabled = true;
+  try {
+    const res = await fetch('https://formspree.io/f/xkoajdyr', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      body: JSON.stringify({email, source: 'WalletLens Waitlist', page: 'walletlens.dev'})
+    });
+    if(res.ok){
+      document.getElementById('waitlistEmail').value = '';
+      document.getElementById('waitlistMsg').style.display = 'block';
+      btn.textContent = '✓ Joined';
+      btn.style.background = 'var(--green)';
+    } else {
+      throw new Error('Failed');
+    }
+  } catch(e) {
+    btn.textContent = 'Try again';
+    btn.disabled = false;
+    btn.style.background = '';
   }
-  document.getElementById('waitlistEmail').value = '';
-  document.getElementById('waitlistMsg').style.display = 'block';
-  // In production you'd POST this to a backend or Mailchimp
-  console.log('Waitlist signup:', email);
 }
 
 // Show usage counter
