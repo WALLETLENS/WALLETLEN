@@ -1154,6 +1154,9 @@ function switchLbChain(chain) {
   });
   const cfg = CHAINS[chain];
   document.getElementById('lbTitle').textContent = 'Top ' + cfg.name + ' Wallets Today';
+  buildLeaderboard();
+}
+
   
 // ============================================
 // WALLET SENTIMENT + BOT SPEED (shown in analyzer results)
@@ -1692,8 +1695,18 @@ function showTool(tool) {
   });
 })();
 
-buildLeaderboard();
-}
+// Leaderboard loads lazily when user scrolls to it (saves RPC quota)
+let leaderboardLoaded = false;
+const lbObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting && !leaderboardLoaded) {
+      leaderboardLoaded = true;
+      buildLeaderboard();
+    }
+  });
+}, {threshold: 0.1});
+const lbSection = document.getElementById('leaderboard');
+if(lbSection) lbObserver.observe(lbSection);
 
 let leaderboardCache = null;
 let leaderboardCacheTime = 0;
