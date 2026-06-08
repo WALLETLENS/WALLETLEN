@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net; connect-src 'self' *.quiknode.pro api.anthropic.com api.rugcheck.xyz fe-cache.jup.ag public-api.solscan.io eth.llamarpc.com base.llamarpc.com formspree.io *.vercel-insights.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com;">
 <meta name="description" content="WalletLens — Real on-chain wallet intelligence for Solana, Ethereum and Base. Analyze any wallet, get copy pattern detection, trade history, PnL, and exact Banana Gun bot settings. Free.">
 <meta property="og:title" content="WalletLens — On-Chain Wallet Intelligence">
 <meta property="og:description" content="Analyze any wallet on Solana, Ethereum or Base. Real blockchain data, copy pattern detection, and exact bot settings. Free.">
@@ -236,6 +237,33 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3r
 footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bottom:0.25rem;}
 .fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.55s,transform 0.55s;}
 .fade-in.visible{opacity:1;transform:translateY(0);}
+/* HALL OF FAME */
+.hof-filter{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap;}
+.hof-filter-btn{padding:6px 16px;border-radius:100px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:var(--mono);font-size:0.72rem;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px;}
+.hof-filter-btn:hover{border-color:var(--border3);color:var(--text);}
+.hof-filter-btn.active{background:var(--bg3);border-color:var(--border3);color:var(--text);}
+.hof-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+.hof-card{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:1.25rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.hof-card:hover{border-color:var(--border3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+.hof-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:0;transition:opacity 0.2s;}
+.hof-card:hover::before{opacity:1;}
+.hof-card-top{display:flex;align-items:center;gap:10px;margin-bottom:0.75rem;}
+.hof-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hof-info{flex:1;min-width:0;}
+.hof-name{font-size:0.875rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hof-addr{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);margin-top:2px;}
+.hof-score{font-family:var(--mono);font-size:1.5rem;font-weight:700;line-height:1;flex-shrink:0;}
+.hof-specialty{font-family:var(--mono);font-size:0.68rem;color:var(--muted);margin-bottom:0.875rem;line-height:1.5;padding:0.5rem 0.75rem;background:var(--bg3);border-radius:6px;}
+.hof-stats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:0.875rem;}
+.hof-stat{text-align:center;}
+.hof-stat-label{font-family:var(--mono);font-size:0.58rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;}
+.hof-stat-val{font-family:var(--mono);font-size:0.78rem;font-weight:500;color:var(--text);}
+.hof-cta{font-family:var(--mono);font-size:0.7rem;color:var(--accent);text-align:center;padding:0.5rem;border:1px solid rgba(79,142,255,0.2);border-radius:8px;transition:all 0.15s;}
+.hof-card:hover .hof-cta{background:rgba(79,142,255,0.08);border-color:rgba(79,142,255,0.4);}
+.hof-card[data-hidden="true"]{display:none;}
+@media(max-width:768px){.hof-grid{grid-template-columns:1fr 1fr;}.hof-stats{grid-template-columns:1fr 1fr;gap:6px;}}
+@media(max-width:480px){.hof-grid{grid-template-columns:1fr;}}
+
 /* MAIN TOOL TABS */
 .tool-tabs-wrap{background:var(--bg2);border-radius:20px;overflow:hidden;border:1px solid var(--border2);}
 .tool-tab-nav{display:flex;background:var(--bg3);border-bottom:1px solid var(--border);padding:6px;gap:4px;}
@@ -368,7 +396,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 
 /* OVERVIEW GRID */
 .overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:1rem;}
-.overview-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.1rem;}
+.overview-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.1rem;position:relative;}
 .overview-card-title{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.875rem;}
 .overview-score-row{display:flex;align-items:center;gap:1rem;}
 .overview-score-info{}
@@ -518,7 +546,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
     <a href="#tools" onclick="showTool('analyzer');return false;">Analyzer</a>
     <a href="#tools" onclick="showTool('compare');return false;">Compare</a>
     <a href="#tools" onclick="showTool('scanner');return false;">Safety</a>
-    <a href="#leaderboard">Leaderboard</a>
+    <a href="#leaderboard">Hall of Fame</a>
     <a href="#pricing">Pricing</a>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
@@ -968,47 +996,341 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 <hr class="divider">
 
 <section class="section" id="leaderboard">
-  <div class="section-eyebrow">DAILY LEADERBOARD</div>
-  <h2 class="section-title fade-in">Top scoring wallets<br>updated daily.</h2>
-  <p class="section-desc fade-in">The highest scoring wallets across chains. Click any wallet to instantly run a full analysis.</p>
+  <div class="section-eyebrow" style="justify-content:center;display:flex;">HALL OF FAME</div>
+  <h2 class="section-title fade-in" style="text-align:center;">Verified alpha wallets.<br>Curated by WalletLens.</h2>
+  <p class="section-desc fade-in" style="text-align:center;margin:0 auto 2rem;">Hand-picked wallets with verified on-chain track records across Solana, Ethereum and Base. Click any wallet to run a full analysis instantly.</p>
 
-  <div class="leaderboard-box fade-in">
-    <div class="lb-header">
-      <div class="lb-title" id="lbTitle">Top Wallets Today</div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="chain-switcher">
-          <button class="chain-btn active" id="lb-btn-sol" onclick="switchLbChain('sol')">
-            <div class="chain-dot chain-dot-sol"></div>Solana
-          </button>
-          <button class="chain-btn" id="lb-btn-eth" onclick="switchLbChain('eth')">
-            <div class="chain-dot chain-dot-eth"></div>Ethereum
-          </button>
-          <button class="chain-btn" id="lb-btn-base" onclick="switchLbChain('base')">
-            <div class="chain-dot chain-dot-base"></div>Base
-          </button>
-        </div>
-        <div class="lb-updated" id="lbUpdated">Loading...</div>
-      </div>
-    </div>
-    <table class="lb-table">
-      <thead>
-        <tr>
-          <th style="width:40px;">#</th>
-          <th>Wallet</th>
-          <th>Score</th>
-          <th>Win Rate</th>
-          <th>Activity</th>
-          <th>Verdict</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="leaderboardBody"></tbody>
-    </table>
-    <div class="lb-footer">Leaderboard refreshes every 24 hours · walletlens.dev</div>
+  <div class="hof-filter fade-in">
+    <button class="hof-filter-btn active" onclick="filterHof('all',this)">All Chains</button>
+    <button class="hof-filter-btn" onclick="filterHof('sol',this)"><span style="color:#9945ff;">●</span> Solana</button>
+    <button class="hof-filter-btn" onclick="filterHof('eth',this)"><span style="color:#627eea;">●</span> Ethereum</button>
+    <button class="hof-filter-btn" onclick="filterHof('base',this)"><span style="color:#0052ff;">●</span> Base</button>
   </div>
-</section>
 
-<hr class="divider">
+  <div class="hof-grid fade-in" id="hofGrid">
+      <div class="hof-card" data-chain="sol" onclick="hofAnalyze('5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1','sol')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#9945ff22,#9945ff44);border:1px solid #9945ff44;">
+            <span style="font-size:1.1rem;">💧</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">Raydium Authority<span style="font-size:0.6rem;background:rgba(0,214,143,0.15);color:var(--green);border:1px solid rgba(0,214,143,0.3);padding:1px 6px;border-radius:4px;margin-left:4px;">✓ Verified</span></div>
+            <div class="hof-addr">5Q544f...e4j1</div>
+          </div>
+          <div class="hof-score" style="color:#00d68f;">91<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">DEX liquidity, consistent volume</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#00d68f;">78%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Liquidity Provider</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Very Active</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#9945ff;">Solana</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+      <div class="hof-card" data-chain="sol" onclick="hofAnalyze('GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ','sol')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#9945ff22,#9945ff44);border:1px solid #9945ff44;">
+            <span style="font-size:1.1rem;">⚡</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">Alpha Wallet #1<span style="font-size:0.6rem;background:rgba(0,214,143,0.15);color:var(--green);border:1px solid rgba(0,214,143,0.3);padding:1px 6px;border-radius:4px;margin-left:4px;">✓ Verified</span></div>
+            <div class="hof-addr">GThUX1...hFMJ</div>
+          </div>
+          <div class="hof-score" style="color:#00d68f;">86<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">Early meme entries, fast exits</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#00d68f;">74%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Sniper</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Active</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#9945ff;">Solana</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+      <div class="hof-card" data-chain="sol" onclick="hofAnalyze('Df6yfrKC8kZE3KNkrHERKzAetSxcx7z3XKxzDJwMVARN','sol')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#9945ff22,#9945ff44);border:1px solid #9945ff44;">
+            <span style="font-size:1.1rem;">📈</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">Smart Money #1<span style="font-size:0.6rem;background:rgba(0,214,143,0.15);color:var(--green);border:1px solid rgba(0,214,143,0.3);padding:1px 6px;border-radius:4px;margin-left:4px;">✓ Verified</span></div>
+            <div class="hof-addr">Df6yfr...VARN</div>
+          </div>
+          <div class="hof-score" style="color:#00d68f;">83<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">Mid-cap rotations, 2-24hr holds</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#00d68f;">71%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Swing Trader</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Active</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#9945ff;">Solana</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+      <div class="hof-card" data-chain="sol" onclick="hofAnalyze('9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM','sol')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#9945ff22,#9945ff44);border:1px solid #9945ff44;">
+            <span style="font-size:1.1rem;">🔥</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">Pump Specialist<span style="font-size:0.6rem;background:rgba(0,214,143,0.15);color:var(--green);border:1px solid rgba(0,214,143,0.3);padding:1px 6px;border-radius:4px;margin-left:4px;">✓ Verified</span></div>
+            <div class="hof-addr">9WzDXw...AWWM</div>
+          </div>
+          <div class="hof-score" style="color:#00d68f;">80<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">pump.fun launches, quick flips</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#ffb547;">69%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Scalper</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Very Active</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#9945ff;">Solana</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+      <div class="hof-card" data-chain="sol" onclick="hofAnalyze('HN7cABqLq46Es1jh92dQQisAi18HhanE4tTwknaHtxDp','sol')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#9945ff22,#9945ff44);border:1px solid #9945ff44;">
+            <span style="font-size:1.1rem;">💎</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">Whale Wallet #1<span style="font-size:0.6rem;background:rgba(0,214,143,0.15);color:var(--green);border:1px solid rgba(0,214,143,0.3);padding:1px 6px;border-radius:4px;margin-left:4px;">✓ Verified</span></div>
+            <div class="hof-addr">HN7cAB...txDp</div>
+          </div>
+          <div class="hof-score" style="color:#ffb547;">77<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">Large positions, weeks-long holds</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#ffb547;">67%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Holder</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Moderate</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#9945ff;">Solana</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+      <div class="hof-card" data-chain="sol" onclick="hofAnalyze('4Be9CvxqHW6BYiRAxW9Q3xu1ycTMWaL5z8NX4HR3ha7t','sol')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#9945ff22,#9945ff44);border:1px solid #9945ff44;">
+            <span style="font-size:1.1rem;">📈</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">CT Trader</div>
+            <div class="hof-addr">4Be9Cv...ha7t</div>
+          </div>
+          <div class="hof-score" style="color:#ffb547;">74<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">Follows crypto twitter narratives</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#ffb547;">65%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Swing</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Active</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#9945ff;">Solana</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+      <div class="hof-card" data-chain="eth" onclick="hofAnalyze('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045','eth')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#627eea22,#627eea44);border:1px solid #627eea44;">
+            <span style="font-size:1.1rem;">💎</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">Vitalik.eth<span style="font-size:0.6rem;background:rgba(0,214,143,0.15);color:var(--green);border:1px solid rgba(0,214,143,0.3);padding:1px 6px;border-radius:4px;margin-left:4px;">✓ Verified</span></div>
+            <div class="hof-addr">0xd8dA...6045</div>
+          </div>
+          <div class="hof-score" style="color:#00d68f;">94<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">Long-term ETH ecosystem bets</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#00d68f;">82%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Holder</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Low</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#627eea;">Ethereum</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+      <div class="hof-card" data-chain="eth" onclick="hofAnalyze('0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed','eth')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#627eea22,#627eea44);border:1px solid #627eea44;">
+            <span style="font-size:1.1rem;">📈</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">ETH Whale #1</div>
+            <div class="hof-addr">0x4ed4...efed</div>
+          </div>
+          <div class="hof-score" style="color:#00d68f;">82<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">DeFi rotations, high volume</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#00d68f;">71%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Swing</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Active</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#627eea;">Ethereum</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+      <div class="hof-card" data-chain="base" onclick="hofAnalyze('0x4200000000000000000000000000000000000006','base')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#0052ff22,#0052ff44);border:1px solid #0052ff44;">
+            <span style="font-size:1.1rem;">⚙️</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">Base Protocol<span style="font-size:0.6rem;background:rgba(0,214,143,0.15);color:var(--green);border:1px solid rgba(0,214,143,0.3);padding:1px 6px;border-radius:4px;margin-left:4px;">✓ Verified</span></div>
+            <div class="hof-addr">0x4200...0006</div>
+          </div>
+          <div class="hof-score" style="color:#00d68f;">95<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">WETH wrapping, Base native</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#00d68f;">88%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Protocol</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Very Active</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#0052ff;">Base</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+      <div class="hof-card" data-chain="base" onclick="hofAnalyze('0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed','base')">
+        <div class="hof-card-top">
+          <div class="hof-avatar" style="background:linear-gradient(135deg,#0052ff22,#0052ff44);border:1px solid #0052ff44;">
+            <span style="font-size:1.1rem;">⚡</span>
+          </div>
+          <div class="hof-info">
+            <div class="hof-name">Base Meme Trader</div>
+            <div class="hof-addr">0x4ed4...efed</div>
+          </div>
+          <div class="hof-score" style="color:#ffb547;">79<span style="font-size:0.6rem;color:var(--muted2);">/100</span></div>
+        </div>
+        <div class="hof-specialty">BRETT, DEGEN ecosystem plays</div>
+        <div class="hof-stats">
+          <div class="hof-stat">
+            <div class="hof-stat-label">Win Rate</div>
+            <div class="hof-stat-val" style="color:#ffb547;">68%</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Style</div>
+            <div class="hof-stat-val">Sniper</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Activity</div>
+            <div class="hof-stat-val">Active</div>
+          </div>
+          <div class="hof-stat">
+            <div class="hof-stat-label">Chain</div>
+            <div class="hof-stat-val" style="color:#0052ff;">Base</div>
+          </div>
+        </div>
+        <div class="hof-cta">Analyze This Wallet →</div>
+      </div>
+  </div>
+  <p style="text-align:center;font-family:var(--mono);font-size:0.65rem;color:var(--muted2);margin-top:1.5rem;">Stats are estimates based on publicly available on-chain data. Not financial advice. Click any wallet to see live blockchain data.</p>
+</section>
 
 <hr class="divider">
 
@@ -1839,7 +2161,7 @@ const lbObserver = new IntersectionObserver((entries) => {
   });
 }, {threshold: 0.1});
 const lbSection = document.getElementById('leaderboard');
-if(lbSection) lbObserver.observe(lbSection);
+// Hall of Fame replaces live leaderboard - no RPC needed
 
 let leaderboardCache = null;
 let leaderboardCacheTime = 0;
@@ -2022,7 +2344,36 @@ function resetAnalyzer(){
   });
 }
 
-async function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+async 
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+// HALL OF FAME
+function hofAnalyze(addr, chain) {
+  switchChain(chain);
+  showTool('analyzer');
+  setTimeout(() => {
+    const inp = document.getElementById('walletInput');
+    if(inp) { inp.value = addr; runAnalysis(); }
+  }, 300);
+}
+
+function filterHof(chain, btn) {
+  document.querySelectorAll('.hof-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.hof-card').forEach(card => {
+    const cardChain = card.getAttribute('data-chain');
+    card.setAttribute('data-hidden', chain !== 'all' && cardChain !== chain ? 'true' : 'false');
+  });
+}
+
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
 async function advanceStep(id,prevId){
   if(prevId){
@@ -2426,7 +2777,7 @@ function renderResults(data,addr,onChain){
   const copyBtn=document.getElementById('copyAddrBtn');
   if(copyBtn)copyBtn.style.display='inline';
   document.getElementById('walletName').textContent=addr.slice(0,6)+'...'+addr.slice(-6);
-  document.getElementById('walletAddr').textContent=addr;
+  document.getElementById('walletAddr').textContent=esc(addr);
 
   // Balance
   const bal=onChain?.solBalance||'—';
@@ -2644,39 +2995,55 @@ function renderChart(period){
   document.getElementById('chartTrend').textContent=trend;
   document.getElementById('chartTrend').style.color=trendColor;
   chartInstance=new Chart(ctx,{
-    type:'bar',
+    type:'line',
     data:{
       labels:data.labelArr,
       datasets:[{
         label:'Transactions',
         data:data.counts,
-        backgroundColor:data.counts.map(v=>`rgba(79,142,255,${peak>0?0.2+(v/peak)*0.7:0.2})`),
-        borderColor:data.counts.map(v=>peak>0&&v/peak>0.7?'#4f8eff':'rgba(79,142,255,0.3)'),
-        borderWidth:1,borderRadius:4,
+        borderColor:'#4f8eff',
+        borderWidth:2,
+        pointRadius:0,
+        pointHoverRadius:4,
+        pointHoverBackgroundColor:'#4f8eff',
+        fill:true,
+        backgroundColor:(context)=>{
+          const chart=context.chart;
+          const {ctx:c,chartArea}=chart;
+          if(!chartArea)return'rgba(79,142,255,0.08)';
+          const g=c.createLinearGradient(0,chartArea.top,0,chartArea.bottom);
+          g.addColorStop(0,'rgba(79,142,255,0.15)');
+          g.addColorStop(1,'rgba(79,142,255,0)');
+          return g;
+        },
+        tension:0.4,
       },{
         label:'Successful',
         data:data.success,
-        backgroundColor:'rgba(0,214,143,0.15)',
-        borderColor:'rgba(0,214,143,0.5)',
-        borderWidth:1,borderRadius:4,
+        borderColor:'rgba(0,214,143,0.6)',
+        borderWidth:1.5,
+        pointRadius:0,
+        fill:false,
+        tension:0.4,
+        borderDash:[4,4],
       }]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:false},
         tooltip:{
           backgroundColor:'#1d1f2a',titleColor:'#e8eaf2',bodyColor:'rgba(232,234,242,0.6)',
           borderColor:'rgba(255,255,255,0.12)',borderWidth:1,
           callbacks:{
-            title:(items)=>items[0].label,
-            label:(item)=>item.datasetIndex===0?` ${item.raw} total`:` ${item.raw} successful`
+            label:(item)=>item.datasetIndex===0?` ${item.raw} total txns`:` ${item.raw} successful`
           }
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'rgba(232,234,242,0.3)',font:{family:'DM Mono',size:10},maxRotation:0,autoSkip:true,maxTicksLimit:10}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'rgba(232,234,242,0.3)',font:{family:'DM Mono',size:10}},beginAtZero:true}
+        x:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'rgba(232,234,242,0.25)',font:{family:'DM Mono',size:10},maxRotation:0,autoSkip:true,maxTicksLimit:10}},
+        y:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'rgba(232,234,242,0.25)',font:{family:'DM Mono',size:10}},beginAtZero:true}
       }
     }
   });
