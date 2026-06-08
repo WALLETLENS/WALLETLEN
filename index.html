@@ -13,7 +13,7 @@
 <meta name="twitter:site" content="@WalletLensDev">
 <meta name="twitter:title" content="WalletLens — On-Chain Wallet Intelligence">
 <meta name="twitter:description" content="Analyze any wallet on Solana, Ethereum or Base. Real blockchain data + exact bot settings. Free.">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>WalletLens — On-Chain Wallet Intelligence for Solana, Ethereum & Base</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080910'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%234f8eff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='none' stroke='%234f8eff' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%234f8eff'/%3E%3Cline x1='16' y1='5' x2='16' y2='11' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='16' y1='21' x2='16' y2='27' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='5' y1='16' x2='11' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='21' y1='16' x2='27' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080910'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%234f8eff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='none' stroke='%234f8eff' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%234f8eff'/%3E%3Cline x1='16' y1='5' x2='16' y2='11' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='16' y1='21' x2='16' y2='27' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='5' y1='16' x2='11' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='21' y1='16' x2='27' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -223,10 +223,101 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3r
 footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bottom:0.25rem;}
 .fade-in{opacity:0;transform:translateY(16px);transition:opacity 0.55s,transform 0.55s;}
 .fade-in.visible{opacity:1;transform:translateY(0);}
+@media(max-width:768px){
+  nav{padding:0 1rem;height:52px;}
+  .nav-links{display:none;}
+  .logo{font-size:1rem;}
+  nav .nav-cta{padding:0.4rem 0.875rem;font-size:0.8rem;}
+  
+  h1{font-size:2rem;letter-spacing:-0.03em;}
+  .hero{padding:5rem 1rem 3rem;}
+  .hero-desc{font-size:0.95rem;}
+  .hero-actions{flex-direction:column;align-items:stretch;}
+  .btn-primary,.btn-ghost{width:100%;text-align:center;}
+  .social-proof{gap:1.25rem;}
+  .proof-num{font-size:1.1rem;}
+  .proof-div{display:none;}
+  
+  .section{padding:3rem 1rem;}
+  .section-title{font-size:1.5rem;}
+  
+  .analyzer-topbar{flex-direction:column;gap:8px;align-items:flex-start;}
+  .chain-switcher{width:100%;justify-content:space-between;}
+  .chain-btn{flex:1;justify-content:center;}
+  .analyzer-body{padding:1rem;}
+  .input-group{flex-direction:column;}
+  .wallet-input{font-size:0.72rem;}
+  .analyze-btn{width:100%;padding:0.75rem;}
+  
+  .wallet-header-card{flex-direction:column;gap:0.875rem;padding:1rem;}
+  .wallet-header-center{text-align:left;}
+  .wallet-header-right{align-items:flex-start;flex-direction:row;flex-wrap:wrap;}
+  .wallet-value-num{font-size:1.25rem;}
+  
+  .result-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .result-tab{font-size:0.65rem;padding:6px 8px;white-space:nowrap;}
+  
+  .overview-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .overview-card{padding:0.875rem;}
+  .win-rate-big{font-size:1.75rem;}
+  .pnl-grid{grid-template-columns:1fr 1fr;}
+  
+  .metrics-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .metric-tile{padding:0.75rem;}
+  .m-value{font-size:0.95rem;}
+  
+  .intel-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .intel-card{padding:0.875rem;}
+  .intel-value{font-size:1.1rem;}
+  
+  .chart-stats{gap:0.875rem;flex-wrap:wrap;}
+  .chart-stat-val{font-size:0.85rem;}
+  
+  .trades-table{font-size:0.68rem;}
+  .trades-table th,.trades-table td{padding:6px 6px;}
+  
+  .config-grid{grid-template-columns:1fr 1fr;}
+  
+  .ext-links{flex-wrap:wrap;gap:6px;}
+  .ext-link-btn{font-size:0.62rem;padding:4px 8px;}
+  
+  .leaderboard-box{overflow-x:auto;}
+  .lb-table{min-width:500px;}
+  .lb-header{flex-direction:column;gap:10px;align-items:flex-start;}
+  .lb-header .chain-switcher{width:100%;}
+  
+  .compare-inputs{grid-template-columns:1fr;gap:8px;}
+  .vs-badge{display:none;}
+  .compare-grid{grid-template-columns:1fr;}
+  
+  .safety-checks{grid-template-columns:1fr;}
+  
+  .pricing-wrap{grid-template-columns:1fr;}
+  
+  .steps-grid{grid-template-columns:1fr;}
+  
+  .speed-bar-label{width:70px;font-size:0.62rem;}
+  
+  .sentiment-labels{font-size:0.6rem;}
+  
+  .result-footer{flex-direction:column;gap:0.5rem;}
+  
+  footer{padding:2rem 1rem;}
+}
+
+@media(max-width:480px){
+  h1{font-size:1.65rem;}
+  .overview-grid{grid-template-columns:1fr;}
+  .intel-grid{grid-template-columns:1fr;}
+  .metrics-grid{grid-template-columns:1fr 1fr;}
+  .config-grid{grid-template-columns:1fr;}
+  .pnl-grid{grid-template-columns:1fr 1fr;}
+}
+
 /* WALLET HEADER CARD */
 .wallet-header-card{background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
 .wallet-header-left{display:flex;align-items:center;gap:12px;}
-.wallet-avatar{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#4f8eff,#a78bfa);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0;}
+.wallet-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,0.1);}
 .wallet-header-info{}
 .wallet-header-name{font-size:1rem;font-weight:700;letter-spacing:-0.01em;margin-bottom:2px;}
 .wallet-header-addr{font-family:var(--mono);font-size:0.68rem;color:var(--muted);}
@@ -530,7 +621,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
                   </div>
                 </div>
                 <div class="overview-score-info">
-                  <div class="overview-score-label">Copy Trading Signal</div>
+                  <div class="overview-score-label">Intelligence Score <span class="tooltip-trigger" onclick="toggleTooltip('scoreMethodTooltip')" style="margin-left:2px;">?</span></div><div class="tooltip-box" id="scoreMethodTooltip">Score is calculated from 5 on-chain factors: transaction success rate (40pts), recent activity (25pts), tracker count (15pts), wallet age (15pts), SOL balance (5pts). Based on live Solana blockchain data via QuickNode RPC.</div>
                   <div id="overviewVerdict" style="font-size:0.85rem;font-weight:600;margin-top:4px;">—</div>
                   <div id="overviewVerdictSub" style="font-family:var(--mono);font-size:0.68rem;color:var(--muted);margin-top:4px;line-height:1.5;">—</div>
                 </div>
@@ -666,8 +757,12 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 
         <!-- TAB: TRADE HISTORY -->
         <div class="result-tab-content" id="tabTrades" style="display:none;">
+          <div id="tradesEmpty" style="display:none;text-align:center;padding:3rem;background:var(--bg3);border:1px solid var(--border);border-radius:14px;margin-bottom:1rem;">
+            <div style="font-family:var(--mono);font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;">No swap data available for this wallet</div>
+            <div style="font-family:var(--mono);font-size:0.68rem;color:var(--muted2);">View full history on <a href="#" id="tradesSolscanLink" target="_blank" style="color:var(--accent);">Solscan</a> or <a href="#" id="tradesGMGNLink" target="_blank" style="color:var(--accent);">GMGN</a></div>
+          </div>
           <div class="trades-box" id="tradesBox">
-            <div class="trades-header"><div class="trades-title">Recent Trade History & PnL</div></div>
+            <div class="trades-header"><div class="trades-title">Real Swap History</div></div>
             <table class="trades-table">
               <thead>
                 <tr>
@@ -886,7 +981,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
         <div class="win-dots"><div class="wd wd1"></div><div class="wd wd2"></div><div class="wd wd3"></div></div>
         <span class="topbar-title">walletlens.dev — token scanner</span>
       </div>
-      <div class="topbar-badge" style="color:var(--amber);">● BETA</div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="font-family:var(--mono);font-size:0.62rem;color:var(--muted2);">Powered by Rugcheck.xyz</span><div class="topbar-badge" style="color:var(--amber);">● BETA</div></div>
     </div>
     <div style="padding:1.5rem;">
       <div class="input-group">
@@ -952,7 +1047,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 <script>
 const CHAINS = {
   sol: {
-    rpc: 'https://cosmopolitan-tiniest-arm.solana-mainnet.quiknode.pro/ac776064cb8c9f4331d354e5a00fb531af49988c/',
+    rpc: '/api/rpc',
     name: 'Solana',
     demo: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
     placeholder: 'Enter Solana wallet address (SOL)...',
@@ -1307,46 +1402,84 @@ Respond ONLY with this exact JSON structure, no markdown:
   "analysis": "<2-3 direct sentences about this specific token. Reference the actual mint authority and freeze authority data. For pump.fun tokens explain the bonding curve model. Be honest about what we know vs don't know.>"
 }`;
 
+  // Try Rugcheck.xyz API first (real data)
+  let rugcheckData = null;
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:900,
-        messages:[{role:'user',content:prompt}]
-      })
+    const rcRes = await fetch(`https://api.rugcheck.xyz/v1/tokens/${token}/report/summary`, {
+      headers: { 'Accept': 'application/json' }
     });
-    const json = await res.json();
-    const raw = json.content[0].text.replace(/```json|```/g,'').trim();
-    const report = JSON.parse(raw);
-    document.getElementById('tokenScanLoading').classList.remove('show');
-    renderTokenSafety(token, report, sigCount);
-  } catch(e) {
-    console.error('Token scan error:', e);
-    // Fallback report
-    const fallback = {
-      safetyScore: isPumpFun ? 45 : 50,
-      verdict: 'CAUTION',
-      verdictClass: 'v-watch',
-      scoreColor: '#ffb547',
-      tokenName: isPumpFun ? 'Pump.fun Token' : 'Unknown Token',
-      checks: [
-        {label:'Token Exists',status:exists?'pass':'warn',value:exists?'Yes':'Unconfirmed'},
-        {label:'Pump.fun Launch',status:isPumpFun?'warn':'pass',value:isPumpFun?'Yes':'No'},
-        {label:'Mint Authority',status:'warn',value:'Could not verify'},
-        {label:'Freeze Authority',status:'warn',value:'Could not verify'},
-        {label:'Transaction Volume',status:sigCount>10?'pass':'warn',value:sigCount+' txns'},
-        {label:'Liquidity',status:'warn',value:'Unknown'},
-        {label:'Holder Distribution',status:'warn',value:'Unknown'},
-        {label:'Rug Risk',status:'warn',value:'Medium - verify on Solscan'},
-      ],
-      analysis: isPumpFun
-        ? 'This appears to be a pump.fun token using a bonding curve model. Pump.fun tokens graduate to Raydium when they hit ~$69k market cap. Always check if liquidity has been locked and who holds the top positions before trading.'
-        : 'Could not fetch complete on-chain data. Exercise caution and verify this token on Solscan before trading. Check mint authority, freeze authority, and top holders manually.'
+    if(rcRes.ok) {
+      rugcheckData = await rcRes.json();
+    }
+  } catch(e) {}
+
+  // Build report from Rugcheck data if available
+  if(rugcheckData) {
+    const risks = rugcheckData.risks || [];
+    const score = rugcheckData.score || 50;
+    const normalized = Math.max(0, Math.min(100, 100 - score)); // Rugcheck: lower = safer
+    const isSafe = normalized >= 70;
+    const isRisky = normalized < 40;
+
+    const checks = [
+      {label:'Token Exists', status:'pass', value:'Verified on-chain'},
+      {label:'Pump.fun Launch', status:isPumpFun?'warn':'pass', value:isPumpFun?'Yes — bonding curve':'No'},
+      {label:'Mint Authority', status:hasMintAuth===false?'pass':hasMintAuth?'fail':'warn', value:hasMintAuth===null?'Unknown':hasMintAuth?'Active (risk)':'Renounced ✓'},
+      {label:'Freeze Authority', status:hasFreezeAuth===false?'pass':hasFreezeAuth?'fail':'warn', value:hasFreezeAuth===null?'Unknown':hasFreezeAuth?'Active (risk)':'None ✓'},
+      {label:'Transaction Volume', status:sigCount>20?'pass':sigCount>5?'warn':'fail', value:sigCount+' recent txns'},
+      {label:'Rugcheck Score', status:normalized>=70?'pass':normalized>=40?'warn':'fail', value:normalized+'/100'},
+      ...risks.slice(0,2).map(r => ({label:r.name||'Risk', status:'fail', value:r.description?.slice(0,30)||'Detected'})),
+    ].slice(0,8);
+
+    const report = {
+      safetyScore: normalized,
+      verdict: isSafe ? 'SAFE' : isRisky ? 'HIGH RISK' : 'CAUTION',
+      verdictClass: isSafe ? 'v-copy' : isRisky ? 'v-skip' : 'v-watch',
+      scoreColor: isSafe ? '#00d68f' : isRisky ? '#ff4d6a' : '#ffb547',
+      tokenName: rugcheckData.tokenMeta?.name || rugcheckData.symbol || (isPumpFun ? 'Pump.fun Token' : 'Unknown Token'),
+      checks,
+      analysis: risks.length > 0
+        ? `Rugcheck identified ${risks.length} risk factor${risks.length>1?'s':''}: ${risks.slice(0,2).map(r=>r.name).join(', ')}. ${isSafe?'Overall risk level is manageable.':'Exercise caution before trading this token.'} ${isPumpFun?'This is a pump.fun token — verify liquidity lock status before entry.':''}`
+        : `No significant risks detected by Rugcheck.xyz. ${hasMintAuth?'Note: mint authority is still active — developer can print more tokens.':''} Always verify on-chain before trading.`
     };
     document.getElementById('tokenScanLoading').classList.remove('show');
-    renderTokenSafety(token, fallback, sigCount);
+    renderTokenSafety(token, report, sigCount);
+  } else {
+    // Rugcheck unavailable — use AI with real on-chain context
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:900,
+          messages:[{role:'user',content:prompt}]
+        })
+      });
+      const json = await res.json();
+      const raw = json.content[0].text.replace(/```json|```/g,'').trim();
+      const report = JSON.parse(raw);
+      document.getElementById('tokenScanLoading').classList.remove('show');
+      renderTokenSafety(token, report, sigCount);
+    } catch(e) {
+      const fallback = {
+        safetyScore: isPumpFun?45:50, verdict:'CAUTION', verdictClass:'v-watch', scoreColor:'#ffb547',
+        tokenName: isPumpFun?'Pump.fun Token':'Unknown Token',
+        checks:[
+          {label:'Token Exists',status:exists?'pass':'warn',value:exists?'Yes':'Unconfirmed'},
+          {label:'Pump.fun Launch',status:isPumpFun?'warn':'pass',value:isPumpFun?'Yes':'No'},
+          {label:'Mint Authority',status:hasMintAuth===null?'warn':hasMintAuth?'fail':'pass',value:hasMintAuth===null?'Unknown':hasMintAuth?'Active':'Renounced'},
+          {label:'Freeze Authority',status:hasFreezeAuth===null?'warn':hasFreezeAuth?'fail':'pass',value:hasFreezeAuth===null?'Unknown':hasFreezeAuth?'Active':'None'},
+          {label:'Transaction Volume',status:sigCount>10?'pass':'warn',value:sigCount+' txns'},
+          {label:'Rugcheck.xyz',status:'warn',value:'Unavailable — verify manually'},
+          {label:'Liquidity',status:'warn',value:'Check Solscan'},
+          {label:'Rug Risk',status:'warn',value:'Unverified — DYOR'},
+        ],
+        analysis: 'Could not fetch Rugcheck data. Verify this token manually on rugcheck.xyz and solscan.io before trading. Check mint authority, freeze authority, and top holder distribution.'
+      };
+      document.getElementById('tokenScanLoading').classList.remove('show');
+      renderTokenSafety(token, fallback, sigCount);
+    }
   }
 
   document.getElementById('safetyResult').classList.add('show');
@@ -1511,6 +1644,32 @@ function switchPnlChart(btn, period) {
   renderPnlChart(period);
 }
 
+
+// DETERMINISTIC WALLET AVATAR
+function getWalletColor(addr) {
+  let hash = 0;
+  for(let i = 0; i < addr.length; i++) {
+    hash = addr.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
+  }
+  const colors = [
+    ['#4f8eff','#3a7aff'],['#00d68f','#00b87a'],['#a78bfa','#8b5cf6'],
+    ['#ff4d6a','#e03055'],['#ffb547','#f0930a'],['#00c4de','#0099b8'],
+    ['#ff6b9d','#e0507a'],['#4ade80','#22c55e'],['#fb923c','#ea580c'],
+    ['#818cf8','#6366f1']
+  ];
+  const idx = Math.abs(hash) % colors.length;
+  return colors[idx];
+}
+
+function setWalletAvatar(addr) {
+  const av = document.getElementById('walletAvatar');
+  if(!av || !addr) return;
+  const colors = getWalletColor(addr);
+  av.style.background = `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`;
+  av.textContent = addr.slice(0,2).toUpperCase();
+}
+
 buildLeaderboard();
 }
 
@@ -1520,7 +1679,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 min cache
 
 async function scoreWalletForLeaderboard(wallet, chain='sol') {
   try {
-    const chainRpc = CHAINS[chain].rpc;
+    const chainRpc = chain === 'sol' ? '/api/rpc' : CHAINS[chain].rpc;
 
     if (chain === 'sol') {
       const [sigsRes, accountRes] = await Promise.all([
@@ -1766,30 +1925,13 @@ async function fetchEVMData(wallet) {
     const recentActivity = Math.min(50, Math.floor(totalTxns / 10));
 
     // Synthetic trade history for EVM
-    const evmTokens = activeChain === 'base'
-      ? ['BRETT','DEGEN','TOSHI','NORMIE','MOCHI','BASED']
-      : ['PEPE','SHIB','FLOKI','WOJAK','TURBO','MEME'];
-    const trades = Array.from({length: Math.min(15, Math.max(5, Math.floor(totalTxns/100)))}, (_,i) => {
-      const isBuy = i%2===0;
-      const isSuccess = Math.random() > 0.3;
-      const token = evmTokens[i % evmTokens.length];
-      const pnlNum = isSuccess ? Math.random()*800-100 : -(Math.random()*300);
-      return {
-        time: (i*3+1)+'h ago',
-        type: isBuy?'BUY':'SELL',
-        token,
-        amount: (0.05+Math.random()*0.5).toFixed(3)+' ETH',
-        pnl: pnlNum >= 0 ? '+$'+pnlNum.toFixed(0) : '-$'+Math.abs(pnlNum).toFixed(0),
-        pnlNum,
-        status: isSuccess?'Success':'Failed'
-      };
-    });
-
-    const completedTrades = trades.filter(t=>t.type==='SELL');
-    const wins = completedTrades.filter(t=>t.pnlNum>0).length;
-    const totalPnl = completedTrades.reduce((a,t)=>a+t.pnlNum,0);
-    const bestTrade = completedTrades.length>0?Math.max(...completedTrades.map(t=>t.pnlNum)):0;
-    const worstTrade = completedTrades.length>0?Math.min(...completedTrades.map(t=>t.pnlNum)):0;
+    // Real EVM trade history would require Etherscan/Alchemy API
+    // Showing empty state rather than fake data
+    const trades = [];
+    const completedTrades = [];
+    const totalPnl = 0;
+    const bestTrade = 0;
+    const worstTrade = 0;
 
     return {
       totalTxns, winRate, recentActivity,
@@ -1847,33 +1989,76 @@ async function fetchOnChainData(wallet){
     const ageScore=Math.min(15,ageInDays>30?15:ageInDays>14?10:5);
     const score=Math.max(10,Math.min(95,trackerScore+activityScore+winRateScore+balanceScore+ageScore));
 
-    // Build synthetic trade history from real signatures
-    const trades=sigs.slice(0,15).map((s,i)=>{
-      const isSuccess=!s.err;
-      const isBuy=i%2===0;
-      const tokens=['BONK','WIF','POPCAT','BOME','MEW','MYRO','SLERF','SAMO','FLOKI','NEIRO'];
-      const token=tokens[i%tokens.length];
-      const amount=(0.1+Math.random()*2).toFixed(3);
-      const pnl=isSuccess?(isBuy?null:(Math.random()*500-100).toFixed(0)):(-(Math.random()*200).toFixed(0));
-      const timeAgo=Math.floor((Date.now()/1000-s.blockTime)/3600);
-      return{
-        time:timeAgo<1?'<1h ago':timeAgo<24?timeAgo+'h ago':Math.floor(timeAgo/24)+'d ago',
-        type:isBuy?'BUY':'SELL',
-        token,
-        amount:amount+' SOL',
-        pnl:pnl===null?'—':(parseFloat(pnl)>=0?'+$'+pnl:'-$'+Math.abs(pnl)),
-        pnlNum:pnl===null?0:parseFloat(pnl),
-        status:isSuccess?'Success':'Failed',
-        sig:s.signature
-      };
-    });
+    // Fetch REAL swap history from Jupiter API
+    let trades = [];
+    let tradeWinRate = winRate;
+    let totalPnl = 0;
+    let bestTrade = 0;
+    let worstTrade = 0;
+    let completedTrades = [];
 
-    const completedTrades=trades.filter(t=>t.type==='SELL'&&t.pnlNum!==0);
-    const wins=completedTrades.filter(t=>t.pnlNum>0).length;
-    const tradeWinRate=completedTrades.length>0?Math.round((wins/completedTrades.length)*100):winRate;
-    const totalPnl=completedTrades.reduce((a,t)=>a+t.pnlNum,0);
-    const bestTrade=completedTrades.length>0?Math.max(...completedTrades.map(t=>t.pnlNum)):0;
-    const worstTrade=completedTrades.length>0?Math.min(...completedTrades.map(t=>t.pnlNum)):0;
+    try {
+      const jupRes = await fetch(
+        `https://fe-cache.jup.ag/portfolio/walletPnl?wallet=${wallet}`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+      if(jupRes.ok) {
+        const jupData = await jupRes.json();
+        const tokens = jupData?.tokens || jupData?.data || [];
+        if(tokens.length > 0) {
+          trades = tokens.slice(0, 15).map(t => {
+            const pnlNum = t.pnl || t.realizedPnl || 0;
+            const timeAgo = t.lastTrade ? Math.floor((Date.now()/1000 - t.lastTrade)/3600) : 0;
+            return {
+              time: timeAgo < 1 ? '<1h ago' : timeAgo < 24 ? timeAgo+'h ago' : Math.floor(timeAgo/24)+'d ago',
+              type: pnlNum >= 0 ? 'SELL' : 'SELL',
+              token: t.symbol || t.mint?.slice(0,6)+'...' || 'Unknown',
+              amount: (t.volume || 0).toFixed(3)+' SOL',
+              pnl: pnlNum >= 0 ? '+$'+pnlNum.toFixed(0) : '-$'+Math.abs(pnlNum).toFixed(0),
+              pnlNum,
+              status: 'Closed',
+              sig: t.mint || ''
+            };
+          });
+          completedTrades = trades.filter(t => t.pnlNum !== 0);
+          const wins = completedTrades.filter(t => t.pnlNum > 0).length;
+          tradeWinRate = completedTrades.length > 0 ? Math.round((wins/completedTrades.length)*100) : winRate;
+          totalPnl = completedTrades.reduce((a,t) => a+t.pnlNum, 0);
+          bestTrade = completedTrades.length > 0 ? Math.max(...completedTrades.map(t=>t.pnlNum)) : 0;
+          worstTrade = completedTrades.length > 0 ? Math.min(...completedTrades.map(t=>t.pnlNum)) : 0;
+        }
+      }
+    } catch(jupErr) {
+      // Jupiter unavailable - try Solscan public API
+      try {
+        const ssRes = await fetch(
+          `https://public-api.solscan.io/account/transactions?account=${wallet}&limit=20`,
+          { headers: { 'Accept': 'application/json' } }
+        );
+        if(ssRes.ok) {
+          const ssTxns = await ssRes.json();
+          trades = (ssTxns || []).slice(0,15).map((tx, i) => {
+            const timeAgo = Math.floor((Date.now()/1000 - tx.blockTime)/3600);
+            return {
+              time: timeAgo < 1 ? '<1h ago' : timeAgo < 24 ? timeAgo+'h ago' : Math.floor(timeAgo/24)+'d ago',
+              type: i%2===0 ? 'BUY' : 'SELL',
+              token: tx.tokenAddress?.slice(0,6)+'...' || 'SOL',
+              amount: ((tx.lamport||0)/1e9).toFixed(4)+' SOL',
+              pnl: '—',
+              pnlNum: 0,
+              status: tx.status === 'Success' ? 'Success' : 'Failed',
+              sig: tx.txHash || ''
+            };
+          });
+        }
+      } catch(e) {}
+    }
+
+    // If no trade data from APIs, leave empty rather than fake
+    if(trades.length === 0) {
+      trades = [];
+      completedTrades = [];
+    }
 
 
     // COPY TRADER DETECTION
@@ -1978,7 +2163,7 @@ async function generateAIReport(wallet,onChain){
   const prompt=`You are WalletLens, a professional on-chain intelligence platform for Solana, Ethereum, and Base. Analyze this ${CHAINS[activeChain].name} wallet: ${wallet}
 ${ctx}
 Respond ONLY with valid JSON, no markdown:
-{"score":${onChain?onChain.score:'<0-100>'},"scoreColor":"${onChain?(onChain.score>=70?'#00d68f':onChain.score>=50?'#ffb547':'#ff4d6a'):'#ffb547'}","verdict":"${onChain?(onChain.score>=72?'COPY NOW':onChain.score>=52?'WATCH':'SKIP'):'WATCH'}","verdictClass":"${onChain?(onChain.score>=72?'v-copy':onChain.score>=52?'v-watch':'v-skip'):'v-watch'}","metrics":[{"label":"WIN RATE","value":"${onChain?onChain.winRate+'%':'XX%'}","color":"${onChain?(onChain.winRate>=65?'c-green':onChain.winRate>=50?'c-amber':'c-red'):'c-amber'}"},{"label":"TOTAL TRADES","value":"${onChain?onChain.totalTxns:'XX'}","color":"c-white"},{"label":"SUCCESS RATE","value":"${onChain?onChain.winRate+'%':'XX%'}","color":"${onChain?(onChain.winRate>=65?'c-green':onChain.winRate>=50?'c-amber':'c-red'):'c-amber'}"},{"label":"TRACKER COUNT","value":"<estimate 0-15>","color":"<c-green/c-amber/c-red>"},{"label":"AVG BUY SIZE","value":"<estimate X.XX SOL>","color":"c-blue"},{"label":"ACTIVITY (7D)","value":"${onChain?onChain.recentActivity+' txns':'X txns'}","color":"c-white"},{"label":"SOL BALANCE","value":"${onChain?onChain.solBalance+' SOL':'X.XX SOL'}","color":"c-blue"},{"label":"WALLET AGE","value":"${onChain?onChain.ageInDays+'d':'XXd'}","color":"c-white"}],"config":{"Buy Gas":"<3-15 GWEI for ETH/Base, 0.003-0.01 SOL for Solana>","Sell Gas":"<3-15 GWEI for ETH/Base, 0.003-0.01 SOL for Solana>","Buy Slippage":"<10-30%>","Sell Slippage":"<10-25%>","Buy Tax Limit":"<8-25%>","Sell Tax Limit":"<8-25%>","Min Mkt Cap":"<$10K-$100K>","Max Mkt Cap":"<$100K-$20M>","Buy Amount":"<0.01-2 SOL/ETH>","Spending Limit":"<0.1-5 SOL/ETH>"},"analysis":"<2-3 sentences. Reference actual on-chain numbers. One strength, one risk, one action. Direct and professional.>"}`;
+{"score":${onChain?onChain.score:'<0-100>'},"scoreColor":"${onChain?(onChain.score>=70?'#00d68f':onChain.score>=50?'#ffb547':'#ff4d6a'):'#ffb547'}","verdict":"${onChain?(onChain.score>=72?'COPY NOW':onChain.score>=52?'WATCH':'SKIP'):'WATCH'}","verdictClass":"${onChain?(onChain.score>=72?'v-copy':onChain.score>=52?'v-watch':'v-skip'):'v-watch'}","metrics":[{"label":"TOTAL TRADES","value":"${onChain?onChain.totalTxns:'XX'}","color":"c-white"},{"label":"SUCCESS RATE","value":"${onChain?onChain.winRate+'%':'XX%'}","color":"${onChain?(onChain.winRate>=65?'c-green':onChain.winRate>=50?'c-amber':'c-red'):'c-amber'}"},{"label":"TRACKER COUNT","value":"<estimate 0-15>","color":"<c-green/c-amber/c-red>"},{"label":"AVG BUY SIZE","value":"<estimate X.XX SOL>","color":"c-blue"},{"label":"ACTIVITY (7D)","value":"${onChain?onChain.recentActivity+' txns':'X txns'}","color":"c-white"},{"label":"SOL BALANCE","value":"${onChain?onChain.solBalance+' SOL':'X.XX SOL'}","color":"c-blue"},{"label":"WALLET AGE","value":"${onChain?onChain.ageInDays+'d':'XXd'}","color":"c-white"}],"config":{"Buy Gas":"<3-15 GWEI for ETH/Base, 0.003-0.01 SOL for Solana>","Sell Gas":"<3-15 GWEI for ETH/Base, 0.003-0.01 SOL for Solana>","Buy Slippage":"<10-30%>","Sell Slippage":"<10-25%>","Buy Tax Limit":"<8-25%>","Sell Tax Limit":"<8-25%>","Min Mkt Cap":"<$10K-$100K>","Max Mkt Cap":"<$100K-$20M>","Buy Amount":"<0.01-2 SOL/ETH>","Spending Limit":"<0.1-5 SOL/ETH>"},"analysis":"<2-3 sentences. Reference actual on-chain numbers. One strength, one risk, one action. Direct and professional.>"}`;
 
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -2003,14 +2188,14 @@ function buildFallback(onChain){
     verdict:score>=72?'COPY NOW':score>=52?'WATCH':'SKIP',
     verdictClass:score>=72?'v-copy':score>=52?'v-watch':'v-skip',
     metrics:[
-      {label:'WIN RATE',value:wr+'%',color:wr>=65?'c-green':wr>=50?'c-amber':'c-red'},
-      {label:'TOTAL TRADES',value:String(onChain?.totalTxns||'—'),color:'c-white'},
-      {label:'SUCCESS RATE',value:wr+'%',color:wr>=65?'c-green':wr>=50?'c-amber':'c-red'},
-      {label:'TRACKER COUNT',value:String(Math.floor(score/15)),color:score>70?'c-green':score>50?'c-amber':'c-red'},
+      {label:'TRACKER COUNT',value:String(Math.min(15,Math.floor(score/10))),color:score>70?'c-green':score>50?'c-amber':'c-red'},
       {label:'AVG BUY SIZE',value:'0.50 SOL',color:'c-blue'},
       {label:'ACTIVITY (7D)',value:(onChain?.recentActivity||'—')+' txns',color:'c-white'},
       {label:'SOL BALANCE',value:(onChain?.solBalance||'—')+' SOL',color:'c-blue'},
-      {label:'WALLET AGE',value:(onChain?.ageInDays||'—')+'d',color:'c-white'}
+      {label:'WALLET AGE',value:(onChain?.ageInDays||'—')+'d',color:'c-white'},
+      {label:'AVG HOLD TIME',value:(onChain?.holdTimeStr||'—'),color:'c-white'},
+      {label:'TOTAL TRADES',value:String(onChain?.totalTxns||'—'),color:'c-white'},
+      {label:'FAILED TXN %',value:onChain?Math.round((onChain.failedTxns/Math.max(1,onChain.totalTxns))*100)+'%':'—',color:onChain&&(onChain.failedTxns/Math.max(1,onChain.totalTxns))<0.1?'c-green':'c-amber'}
     ],
     config:{'Buy Gas':'5 GWEI','Sell Gas':'5 GWEI','Buy Slippage':'15%','Sell Slippage':'15%','Buy Tax Limit':'8%','Sell Tax Limit':'8%','Min Mkt Cap':'$50K','Max Mkt Cap':'$20M','Buy Amount':'0.01 SOL','Spending Limit':'0.5 SOL'},
     analysis:good
@@ -2029,8 +2214,7 @@ function renderResults(data,addr,onChain){
 
   // Wallet header
   const initials=addr.slice(0,2).toUpperCase();
-  const av=document.getElementById('walletAvatar');
-  if(av)av.textContent=initials;
+  setWalletAvatar(addr);
   const copyBtn=document.getElementById('copyAddrBtn');
   if(copyBtn)copyBtn.style.display='inline';
   document.getElementById('walletName').textContent=addr.slice(0,6)+'...'+addr.slice(-6);
@@ -2136,7 +2320,21 @@ function renderResults(data,addr,onChain){
   }
 
   // Trade history (inside Trade History tab)
-  if(onChain&&onChain.trades){
+  const tradesEmpty = document.getElementById('tradesEmpty');
+  const tradesBox = document.getElementById('tradesBox');
+  if(onChain&&onChain.trades&&onChain.trades.length>0){
+    if(tradesEmpty) tradesEmpty.style.display='none';
+    if(tradesBox) tradesBox.style.display='block';
+    // Update empty state links
+    const ssLink = document.getElementById('tradesSolscanLink');
+    const gmgnLink = document.getElementById('tradesGMGNLink');
+    if(ssLink) ssLink.href = 'https://solscan.io/account/'+addr;
+    if(gmgnLink) gmgnLink.href = 'https://gmgn.ai/sol/address/'+addr;
+  } else {
+    if(tradesEmpty) tradesEmpty.style.display='block';
+    if(tradesBox) tradesBox.style.display='none';
+  }
+  if(onChain&&onChain.trades&&onChain.trades.length>0){
     const RUG_TOKENS=['SLERF','BOME','MYRO','FLOKI','NEIRO','SAMO'];
     const tbody=document.getElementById('tradesBody');
     tbody.innerHTML=onChain.trades.map(t=>{
