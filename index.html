@@ -1,4 +1,4 @@
-<!-- WalletLens v3.0 -->
+<!-- WalletLens v2.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1035,7 +1035,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 <script>
 const CHAINS = {
   sol: {
-    rpc: '/api/rpc',
+    rpc: 'https://cosmopolitan-tiniest-arm.solana-mainnet.quiknode.pro/ac776064cb8c9f4331d354e5a00fb531af49988c/',
     name: 'Solana',
     demo: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
     placeholder: 'Enter Solana wallet address (SOL)...',
@@ -1701,7 +1701,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 min cache
 
 async function scoreWalletForLeaderboard(wallet, chain='sol') {
   try {
-    const chainRpc = chain === 'sol' ? '/api/rpc' : CHAINS[chain].rpc;
+    const chainRpc = chain === 'sol' ? 'https://cosmopolitan-tiniest-arm.solana-mainnet.quiknode.pro/ac776064cb8c9f4331d354e5a00fb531af49988c/' : CHAINS[chain].rpc;
 
     if (chain === 'sol') {
       const [sigsRes, accountRes] = await Promise.all([
@@ -1888,30 +1888,15 @@ async function advanceStep(id,prevId){
 }
 
 async function rpc(method,params){
-  const DIRECT_RPC = 'https://cosmopolitan-tiniest-arm.solana-mainnet.quiknode.pro/ac776064cb8c9f4331d354e5a00fb531af49988c/';
-  const activeRpc = activeChain === 'sol' ? '/api/rpc' : CHAINS[activeChain]?.rpc;
-  let res, json;
-  try {
-    res = await fetch(activeRpc, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})
-    });
-    if(!res.ok) throw new Error('proxy failed');
-    json = await res.json();
-    if(json.error && activeChain === 'sol') throw new Error('proxy error');
-  } catch(e) {
-    // Fallback to direct RPC if proxy unavailable
-    if(activeChain === 'sol') {
-      res = await fetch(DIRECT_RPC, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})
-      });
-      json = await res.json();
-    } else { throw e; }
-  }
-  if(json.error)throw new Error(json.error.message);
+  const SOL_RPC = 'https://cosmopolitan-tiniest-arm.solana-mainnet.quiknode.pro/ac776064cb8c9f4331d354e5a00fb531af49988c/';
+  const endpoint = activeChain === 'sol' ? SOL_RPC : CHAINS[activeChain]?.rpc;
+  const res = await fetch(endpoint, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})
+  });
+  const json = await res.json();
+  if(json.error) throw new Error(json.error.message||'RPC error');
   return json.result;
 }
 
@@ -2190,22 +2175,32 @@ async function runAnalysis(){
   const chainName = CHAINS[activeChain]?.name || 'Solana';
   document.getElementById('loaderLabel').textContent='Connecting to '+chainName+' mainnet...';
 
-  const onChain=await fetchOnChainData(addr);
+  try {
+    const onChain=await fetchOnChainData(addr);
 
-  await advanceStep('ls5','ls4');
-  await sleep(400);
-  document.getElementById('loaderLabel').textContent='Composing AI report...';
-  const report=await generateAIReport(addr,onChain);
+    await advanceStep('ls5','ls4');
+    await sleep(400);
+    document.getElementById('loaderLabel').textContent='Composing AI report...';
+    const report=await generateAIReport(addr,onChain);
 
-  await advanceStep('ls6','ls5');
-  await sleep(500);
-  document.getElementById('ls6').classList.replace('active','done');
+    await advanceStep('ls6','ls5');
+    await sleep(500);
+    document.getElementById('ls6').classList.replace('active','done');
 
-  document.getElementById('loadingState').classList.remove('show');
-  renderResults(report,addr,onChain);
-  document.getElementById('results').classList.add('show');
-  document.getElementById('analyzeBtn').disabled=false;
-  document.getElementById('analyzeBtn').textContent='Analyze →';
+    document.getElementById('loadingState').classList.remove('show');
+    renderResults(report,addr,onChain);
+    document.getElementById('results').classList.add('show');
+  } catch(err) {
+    console.error('Analysis error:', err);
+    document.getElementById('loadingState').classList.remove('show');
+    // Show fallback results even on error
+    const fallbackReport = buildFallback(null);
+    renderResults(fallbackReport, addr, null);
+    document.getElementById('results').classList.add('show');
+  } finally {
+    document.getElementById('analyzeBtn').disabled=false;
+    document.getElementById('analyzeBtn').textContent='Analyze →';
+  }
 }
 
 async function generateAIReport(wallet,onChain){
