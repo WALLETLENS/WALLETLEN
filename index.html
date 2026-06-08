@@ -84,18 +84,31 @@ h1 .hl{background:linear-gradient(135deg,#4f8eff,#a78bfa);-webkit-background-cli
 .input-hint{font-family:var(--mono);font-size:0.68rem;color:var(--muted2);margin-bottom:1.5rem;}
 .input-hint span{color:var(--accent);cursor:pointer;text-decoration:underline;}
 
-.loading-state{display:none;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1rem;gap:1.25rem;}
+.loading-state{display:none;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1.5rem;gap:0;}
 .loading-state.show{display:flex;}
-.loader-ring{width:40px;height:40px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.75s linear infinite;}
+.loader-ring{width:36px;height:36px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.75s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.loader-label{font-family:var(--mono);font-size:0.78rem;color:var(--muted);}
-.loader-steps{list-style:none;display:flex;flex-direction:column;gap:6px;width:100%;max-width:340px;}
-.loader-steps li{font-family:var(--mono);font-size:0.7rem;color:var(--muted2);padding:6px 12px;border-radius:6px;transition:all 0.3s;display:flex;align-items:center;gap:8px;}
-.loader-steps li::before{content:'○';font-size:0.6rem;}
-.loader-steps li.active{color:var(--green);background:rgba(0,214,143,0.06);}
-.loader-steps li.active::before{content:'●';}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+@keyframes scan{0%{width:0%;opacity:1;}90%{width:100%;opacity:1;}100%{width:100%;opacity:0;}}
+.loader-wrap{width:100%;max-width:380px;background:var(--bg3);border:1px solid var(--border2);border-radius:14px;overflow:hidden;}
+.loader-header{display:flex;align-items:center;gap:10px;padding:1rem 1.25rem;border-bottom:1px solid var(--border);}
+.loader-header-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.5s ease-in-out infinite;}
+.loader-header-title{font-family:var(--mono);font-size:0.72rem;color:var(--text);font-weight:500;}
+.loader-header-chain{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);margin-left:auto;}
+.loader-steps{list-style:none;display:flex;flex-direction:column;padding:0.75rem 0;}
+.loader-steps li{font-family:var(--mono);font-size:0.72rem;color:var(--muted2);padding:0.5rem 1.25rem;display:flex;align-items:center;gap:10px;transition:all 0.25s;}
+.loader-step-icon{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.55rem;transition:all 0.3s;}
+.loader-steps li.active{color:var(--text);}
+.loader-steps li.active .loader-step-icon{border-color:var(--accent);background:rgba(79,142,255,0.1);animation:pulse 1s ease-in-out infinite;}
+.loader-steps li.active .loader-step-icon::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);}
 .loader-steps li.done{color:var(--muted);}
-.loader-steps li.done::before{content:'✓';color:var(--green);}
+.loader-steps li.done .loader-step-icon{border-color:var(--green);background:rgba(0,214,143,0.1);}
+.loader-steps li.done .loader-step-icon::after{content:'✓';color:var(--green);font-size:0.65rem;}
+.loader-bar-wrap{padding:0.75rem 1.25rem;border-top:1px solid var(--border);}
+.loader-bar{height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.loader-fill{height:100%;background:linear-gradient(90deg,var(--accent),#a78bfa);border-radius:2px;width:0%;transition:width 0.6s ease;}
+.loader-label{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);margin-top:6px;text-align:center;}
 
 .results{display:none;}
 .results.show{display:block;}
@@ -231,7 +244,11 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 .tool-tab-btn.active{background:var(--bg4);color:var(--text);border:1px solid var(--border2);}
 .tool-tab-btn .ttb-dot{width:7px;height:7px;border-radius:50%;}
 .tool-tab-panel{display:none !important;}
-.tool-tab-panel.active{display:block !important;}
+.tool-tab-panel.active{display:block !important;animation:fadeSlideIn 0.2s ease;}
+.tool-tabs-wrap{position:relative;}
+.tool-tab-btn.active{background:var(--bg4);color:var(--text);border:1px solid var(--border2);}
+.tool-active-indicator{position:absolute;bottom:0;left:0;right:0;height:2px;background:transparent;pointer-events:none;}
+.active-panel-border{border-top:2px solid var(--accent);margin-top:-1px;}
 @media(max-width:600px){
   .tool-tab-btn{font-size:0.65rem;padding:8px 8px;gap:4px;}
   .tool-tab-btn span{display:none;}
@@ -557,6 +574,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 
     <!-- ANALYZER PANEL -->
     <div class="tool-tab-panel active" id="panel-analyzer">
+      <div class="active-panel-border"></div>
       <div class="analyzer-topbar">
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="win-dots"><div class="wd wd1"></div><div class="wd wd2"></div><div class="wd wd3"></div></div>
@@ -584,16 +602,25 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
           <span id="adminIndicator" style="display:none;color:var(--green);font-weight:600;"> ✓ Admin mode — unlimited</span>
         </div>
         <div class="loading-state" id="loadingState">
-          <div class="loader-steps">
-            <div class="loader-step active" id="ls1"><div class="ls-dot"></div><span>Fetching transaction signatures</span></div>
-            <div class="loader-step" id="ls2"><div class="ls-dot"></div><span>Parsing trade & swap history</span></div>
-            <div class="loader-step" id="ls3"><div class="ls-dot"></div><span>Calculating real PnL per trade</span></div>
-            <div class="loader-step" id="ls4"><div class="ls-dot"></div><span>Running 8-factor wallet score</span></div>
-            <div class="loader-step" id="ls5"><div class="ls-dot"></div><span>Generating bot configuration</span></div>
-            <div class="loader-step" id="ls6"><div class="ls-dot"></div><span>Composing AI intelligence report</span></div>
+          <div class="loader-wrap">
+            <div class="loader-header">
+              <div class="loader-header-dot"></div>
+              <span class="loader-header-title">Analyzing wallet...</span>
+              <span class="loader-header-chain" id="loaderLabel">Connecting...</span>
+            </div>
+            <ul class="loader-steps">
+              <li id="ls1" class="active"><div class="loader-step-icon"></div>Fetching transaction signatures</li>
+              <li id="ls2"><div class="loader-step-icon"></div>Parsing trade & swap history</li>
+              <li id="ls3"><div class="loader-step-icon"></div>Calculating real PnL per trade</li>
+              <li id="ls4"><div class="loader-step-icon"></div>Running 8-factor wallet score</li>
+              <li id="ls5"><div class="loader-step-icon"></div>Generating bot configuration</li>
+              <li id="ls6"><div class="loader-step-icon"></div>Composing AI intelligence report</li>
+            </ul>
+            <div class="loader-bar-wrap">
+              <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+              <div class="loader-label" id="loaderSub">Starting scan...</div>
+            </div>
           </div>
-          <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
-          <div class="loader-label" id="loaderLabel">Connecting to chain...</div>
         </div>
         <div class="results" id="results">
 
@@ -685,6 +712,25 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 
           <!-- Metrics strip -->
           <div class="metrics-grid" id="metricsGrid"></div>
+
+          <!-- Live PnL Chart in Overview -->
+          <div class="chart-box" id="overviewPnlBox" style="display:none;margin-top:1rem;">
+            <div class="chart-header">
+              <div class="chart-title">PnL Over Time</div>
+              <div class="chart-tabs">
+                <button class="chart-tab active" onclick="switchOverviewPnl(this,'1d')">1D</button>
+                <button class="chart-tab" onclick="switchOverviewPnl(this,'7d')">7D</button>
+                <button class="chart-tab" onclick="switchOverviewPnl(this,'30d')">30D</button>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap"><canvas id="overviewPnlChart"></canvas></div>
+            <div class="chart-stats">
+              <div class="chart-stat"><div class="chart-stat-label">Peak PnL</div><div class="chart-stat-val c-green" id="ovPnlPeak">—</div></div>
+              <div class="chart-stat"><div class="chart-stat-label">Lowest</div><div class="chart-stat-val c-red" id="ovPnlLow">—</div></div>
+              <div class="chart-stat"><div class="chart-stat-val" id="ovPnlNetStat" style="font-size:0.95rem;font-weight:600;">—</div><div class="chart-stat-label">Net PnL</div></div>
+              <div class="chart-stat"><div class="chart-stat-val" id="ovPnlTrend">—</div><div class="chart-stat-label">Trend</div></div>
+            </div>
+          </div>
 
           <!-- Sentiment -->
           <div class="sentiment-bar-wrap" id="sentimentBox" style="display:none;">
@@ -839,6 +885,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 
     <!-- COMPARE PANEL -->
     <div class="tool-tab-panel" id="panel-compare">
+      <div class="active-panel-border"></div>
       <div class="analyzer-topbar">
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="win-dots"><div class="wd wd1"></div><div class="wd wd2"></div><div class="wd wd3"></div></div>
@@ -871,6 +918,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 
     <!-- SCANNER PANEL -->
     <div class="tool-tab-panel" id="panel-scanner">
+      <div class="active-panel-border"></div>
       <div class="analyzer-topbar">
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="win-dots"><div class="wd wd1"></div><div class="wd wd2"></div><div class="wd wd3"></div></div>
@@ -1157,7 +1205,86 @@ function switchLbChain(chain) {
   buildLeaderboard();
 }
 
-  
+// OVERVIEW PNL CHART
+let overviewPnlInstance = null;
+let overviewPnlData = {'1d':null,'7d':null,'30d':null};
+
+function renderOverviewPnl(period) {
+  const data = overviewPnlData[period];
+  if(!data || !data.cumulativePnl) return;
+  const ctx = document.getElementById('overviewPnlChart');
+  if(!ctx) return;
+  if(overviewPnlInstance) overviewPnlInstance.destroy();
+
+  const isPos = data.netPnl >= 0;
+  const lineColor = isPos ? '#00d68f' : '#ff4d6a';
+
+  const peakEl = document.getElementById('ovPnlPeak');
+  const lowEl = document.getElementById('ovPnlLow');
+  const netEl = document.getElementById('ovPnlNetStat');
+  const trendEl = document.getElementById('ovPnlTrend');
+
+  if(peakEl) peakEl.textContent = '+$' + Math.abs(data.maxPnl).toFixed(0);
+  if(lowEl) lowEl.textContent = (data.minPnl >= 0 ? '+$' : '-$') + Math.abs(data.minPnl).toFixed(0);
+  if(netEl) { netEl.textContent = (isPos ? '+$' : '-$') + Math.abs(data.netPnl).toFixed(0); netEl.style.color = lineColor; }
+  if(trendEl) { trendEl.textContent = data.trend; trendEl.style.color = data.trend.includes('↑') ? 'var(--green)' : 'var(--red)'; }
+
+  overviewPnlInstance = new Chart(ctx.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: data.labelArr,
+      datasets: [{
+        data: data.cumulativePnl,
+        borderColor: lineColor,
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: lineColor,
+        fill: true,
+        backgroundColor: (ctx2) => {
+          const chart = ctx2.chart;
+          const {ctx: c, chartArea} = chart;
+          if(!chartArea) return 'rgba(0,0,0,0)';
+          const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          g.addColorStop(0, isPos ? 'rgba(0,214,143,0.15)' : 'rgba(255,77,106,0.15)');
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          return g;
+        },
+        tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1d1f2a',
+          titleColor: '#e8eaf2',
+          bodyColor: 'rgba(232,234,242,0.7)',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          callbacks: { label: (i) => ` PnL: ${i.raw >= 0 ? '+' : ''}$${i.raw.toFixed(0)}` }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: 'rgba(232,234,242,0.25)', font: { family: 'DM Mono', size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
+        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: 'rgba(232,234,242,0.25)', font: { family: 'DM Mono', size: 10 }, callback: v => (v >= 0 ? '+$' : '-$') + Math.abs(v).toFixed(0) } }
+      }
+    }
+  });
+}
+
+function switchOverviewPnl(btn, period) {
+  document.querySelectorAll('#overviewPnlBox .chart-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderOverviewPnl(period);
+}
+
+buildLeaderboard();
+
+
 // ============================================
 // WALLET SENTIMENT + BOT SPEED (shown in analyzer results)
 // ============================================
@@ -1667,6 +1794,7 @@ function setWalletAvatar(addr) {
 
 
 // MAIN TOOL TABS
+const TOOL_COLORS = {analyzer:'#4f8eff', compare:'#a78bfa', scanner:'#00d68f'};
 function showTool(tool) {
   ['analyzer','compare','scanner'].forEach(t => {
     const btn = document.getElementById('ttb-'+t);
@@ -1675,6 +1803,9 @@ function showTool(tool) {
     if(panel) {
       panel.classList.toggle('active', t===tool);
       panel.style.display = t===tool ? 'block' : 'none';
+      // Update accent border color
+      const border = panel.querySelector('.active-panel-border');
+      if(border && t===tool) border.style.background = TOOL_COLORS[tool]||'var(--accent)';
     }
   });
   const toolsEl = document.getElementById('tools');
@@ -1690,6 +1821,8 @@ function showTool(tool) {
     if(panel) {
       panel.style.display = i === 0 ? 'block' : 'none';
       panel.classList.toggle('active', i === 0);
+      const border = panel.querySelector('.active-panel-border');
+      if(border) border.style.background = TOOL_COLORS[t] || 'var(--accent)';
     }
     if(btn) btn.classList.toggle('active', i === 0);
   });
@@ -1894,10 +2027,20 @@ async function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 async function advanceStep(id,prevId){
   if(prevId){
     const p=document.getElementById(prevId);
-    p.classList.remove('active');p.classList.add('done');
+    if(p){p.classList.remove('active');p.classList.add('done');}
   }
-  document.getElementById(id).classList.add('active');
-  await sleep(650+Math.random()*350);
+  const el=document.getElementById(id);
+  if(el) el.classList.add('active');
+  // Update progress bar
+  const steps=['ls1','ls2','ls3','ls4','ls5','ls6'];
+  const idx=steps.indexOf(id);
+  const pct=Math.round(((idx+1)/steps.length)*100);
+  const fill=document.getElementById('loaderFill');
+  if(fill) fill.style.width=pct+'%';
+  const sub=document.getElementById('loaderSub');
+  const labels=['Querying blockchain...','Reading swap history...','Calculating PnL...','Scoring wallet...','Building bot config...','Running AI analysis...'];
+  if(sub) sub.textContent=labels[idx]||'Processing...';
+  await sleep(600+Math.random()*300);
 }
 
 async function rpc(method,params){
@@ -2150,6 +2293,9 @@ async function runAnalysis(){
   document.getElementById('rateLimitBanner').classList.remove('show');
 
   // Clear previous results
+  overviewPnlData={'1d':null,'7d':null,'30d':null};
+  if(overviewPnlInstance){overviewPnlInstance.destroy();overviewPnlInstance=null;}
+  const ovBox=document.getElementById('overviewPnlBox');if(ovBox)ovBox.style.display='none';
   const chartBoxEl = document.getElementById('chartBox');
   if(chartBoxEl) chartBoxEl.style.display='none';
   const intelGridEl = document.getElementById('intelGrid');
@@ -2186,7 +2332,8 @@ async function runAnalysis(){
   document.getElementById('loadingState').classList.add('show');
   document.getElementById('analyzeBtn').disabled=true;
   const chainName = CHAINS[activeChain]?.name || 'Solana';
-  document.getElementById('loaderLabel').textContent='Connecting to '+chainName+' mainnet...';
+  document.getElementById('loaderLabel').textContent=chainName+' mainnet';
+if(document.getElementById('loaderSub'))document.getElementById('loaderSub').textContent='Starting scan...';
 
   try {
     const onChain=await fetchOnChainData(addr);
@@ -2338,6 +2485,19 @@ function renderResults(data,addr,onChain){
 
   // Metrics strip
   document.getElementById('metricsGrid').innerHTML=data.metrics.map(m=>`<div class="metric-tile"><div class="m-label">${m.label}</div><div class="m-value ${m.color}">${m.value}</div></div>`).join('');
+
+  // Overview PnL chart (shown immediately)
+  if(onChain && onChain.trades && onChain.trades.length > 0) {
+    overviewPnlData['1d'] = buildPnlChartData(onChain.trades, rawSigs, '1d');
+    overviewPnlData['7d'] = buildPnlChartData(onChain.trades, rawSigs, '7d');
+    overviewPnlData['30d'] = buildPnlChartData(onChain.trades, rawSigs, '30d');
+    document.getElementById('overviewPnlBox').style.display = 'block';
+    document.querySelectorAll('#overviewPnlBox .chart-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+    setTimeout(() => renderOverviewPnl('1d'), 100);
+  } else {
+    const ob = document.getElementById('overviewPnlBox');
+    if(ob) ob.style.display = 'none';
+  }
 
   // Bot config
   document.getElementById('configGrid').innerHTML=Object.entries(data.config).map(([k,v])=>`<div class="config-item"><div class="config-key">${k}</div><div class="config-val">${v}</div></div>`).join('');
