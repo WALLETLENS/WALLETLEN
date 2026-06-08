@@ -230,8 +230,8 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 .tool-tab-btn:hover{color:var(--text);}
 .tool-tab-btn.active{background:var(--bg4);color:var(--text);border:1px solid var(--border2);}
 .tool-tab-btn .ttb-dot{width:7px;height:7px;border-radius:50%;}
-.tool-tab-panel{display:none;}
-.tool-tab-panel.active{display:block;}
+.tool-tab-panel{display:none !important;}
+.tool-tab-panel.active{display:block !important;}
 @media(max-width:600px){
   .tool-tab-btn{font-size:0.65rem;padding:8px 8px;gap:4px;}
   .tool-tab-btn span{display:none;}
@@ -498,9 +498,9 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
     WalletLens
   </div>
   <div class="nav-links">
-    <a href="#tools" onclick="showTool('analyzer')">Analyzer</a>
-    <a href="#tools" onclick="showTool('compare')">Compare</a>
-    <a href="#tools" onclick="showTool('scanner')">Safety</a>
+    <a href="#tools" onclick="showTool('analyzer');return false;">Analyzer</a>
+    <a href="#tools" onclick="showTool('compare');return false;">Compare</a>
+    <a href="#tools" onclick="showTool('scanner');return false;">Safety</a>
     <a href="#leaderboard">Leaderboard</a>
     <a href="#pricing">Pricing</a>
   </div>
@@ -593,7 +593,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
             <div class="loader-step" id="ls6"><div class="ls-dot"></div><span>Composing AI intelligence report</span></div>
           </div>
           <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
-          <div class="loader-label" id="loaderLabel">Connecting to Solana mainnet...</div>
+          <div class="loader-label" id="loaderLabel">Connecting to chain...</div>
         </div>
         <div class="results" id="results">
 
@@ -1076,21 +1076,25 @@ function switchChain(chain) {
 
   // Update buttons
   ['sol','eth','base'].forEach(c => {
-    document.getElementById('btn-'+c).classList.toggle('active', c === chain);
+    const b = document.getElementById('btn-'+c);
+    if(b) b.classList.toggle('active', c === chain);
   });
 
   // Update chain info bar
   const dot = document.getElementById('chainDot');
-  dot.className = 'chain-dot ' + cfg.dot;
-  document.getElementById('chainInfoText').textContent = cfg.info;
+  if(dot) { dot.className = 'chain-dot ' + cfg.dot; }
+  const infoText = document.getElementById('chainInfoText');
+  if(infoText) infoText.textContent = cfg.info;
 
   // Update placeholder
   const inp = document.getElementById('walletInput');
   if(inp) inp.placeholder = cfg.placeholder;
 
-  // Update topbar badge color
-  const badge = document.querySelector('.topbar-badge');
-  if(badge) badge.style.color = cfg.color;
+  // Update loader label to match chain
+  const loaderLabel = document.getElementById('loaderLabel');
+  if(loaderLabel && !loaderLabel.textContent.includes('...') === false) {
+    loaderLabel.textContent = 'Connecting to ' + cfg.name + ' mainnet...';
+  }
 
   // Reset analyzer
   resetAnalyzer();
@@ -1662,11 +1666,32 @@ function setWalletAvatar(addr) {
 // MAIN TOOL TABS
 function showTool(tool) {
   ['analyzer','compare','scanner'].forEach(t => {
-    document.getElementById('ttb-'+t)?.classList.toggle('active', t===tool);
-    document.getElementById('panel-'+t)?.classList.toggle('active', t===tool);
+    const btn = document.getElementById('ttb-'+t);
+    const panel = document.getElementById('panel-'+t);
+    if(btn) btn.classList.toggle('active', t===tool);
+    if(panel) {
+      panel.classList.toggle('active', t===tool);
+      panel.style.display = t===tool ? 'block' : 'none';
+    }
   });
-  document.getElementById('tools')?.scrollIntoView({behavior:'smooth',block:'start'});
+  const toolsEl = document.getElementById('tools');
+  if(toolsEl) toolsEl.scrollIntoView({behavior:'smooth', block:'start'});
 }
+
+// Initialize tool panels on load
+(function initToolPanels() {
+  const panels = ['analyzer', 'compare', 'scanner'];
+  panels.forEach((t, i) => {
+    const panel = document.getElementById('panel-' + t);
+    const btn = document.getElementById('ttb-' + t);
+    if(panel) {
+      panel.style.display = i === 0 ? 'block' : 'none';
+      panel.classList.toggle('active', i === 0);
+    }
+    if(btn) btn.classList.toggle('active', i === 0);
+  });
+})();
+
 buildLeaderboard();
 }
 
@@ -2116,6 +2141,9 @@ async function fetchOnChainData(wallet){
 }
 
 async function runAnalysis(){
+  // Make sure analyzer panel is visible
+  showTool('analyzer');
+
   // Check rate limit
   if(checkRateLimit()){
     document.getElementById('rateLimitBanner').classList.add('show');
@@ -2124,18 +2152,29 @@ async function runAnalysis(){
   document.getElementById('rateLimitBanner').classList.remove('show');
 
   // Clear previous results
-  document.getElementById('chartBox').style.display='none';
-  document.getElementById('intelGrid').style.display='none';
-  document.getElementById('sentimentBox').style.display='none';
-  document.getElementById('extLinks').style.display='none';
+  const chartBoxEl = document.getElementById('chartBox');
+  if(chartBoxEl) chartBoxEl.style.display='none';
+  const intelGridEl = document.getElementById('intelGrid');
+  if(intelGridEl) intelGridEl.style.display='none';
+  const sentimentEl = document.getElementById('sentimentBox');
+  if(sentimentEl) sentimentEl.style.display='none';
+  const extLinksEl = document.getElementById('extLinks');
+  if(extLinksEl) extLinksEl.style.display='none';
   document.getElementById('results').classList.remove('show');
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
-  rawSigs=[];chartData={'1d':null,'7d':null,'30d':null};
-  ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id=>{const el=document.getElementById(id);el.classList.remove('active','done');});
+  if(pnlChartInstance){pnlChartInstance.destroy();pnlChartInstance=null;}
+  rawSigs=[];chartData={'1d':null,'7d':null,'30d':null};pnlChartData={'1d':null,'7d':null,'30d':null};
+  ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('active','done');
+  });
 
   const raw=document.getElementById('walletInput').value.trim();
   const addr=sanitizeAddress(raw);
-  if(!addr||addr.length<30){
+  const isEthAddr = addr.startsWith('0x');
+  const validSol = !isEthAddr && addr.length >= 32 && addr.length <= 44;
+  const validEth = isEthAddr && addr.length === 42;
+  if(!addr || (!validSol && !validEth)){
     const inp=document.getElementById('walletInput');
     inp.style.borderColor='var(--red)';
     document.getElementById('inputError').classList.add('show');
@@ -2148,7 +2187,8 @@ async function runAnalysis(){
   document.getElementById('results').classList.remove('show');
   document.getElementById('loadingState').classList.add('show');
   document.getElementById('analyzeBtn').disabled=true;
-  document.getElementById('loaderLabel').textContent='Connecting to Solana mainnet...';
+  const chainName = CHAINS[activeChain]?.name || 'Solana';
+  document.getElementById('loaderLabel').textContent='Connecting to '+chainName+' mainnet...';
 
   const onChain=await fetchOnChainData(addr);
 
@@ -2542,9 +2582,11 @@ function checkRateLimit(){
 function validateInput(input){
   const val = input.value.trim();
   const err = document.getElementById('inputError');
-  // Basic Solana address validation — base58, 32-44 chars
-  const base58Regex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-  if(val.length > 0 && !base58Regex.test(val)){
+  if(val.length === 0) { err.classList.remove('show'); input.style.borderColor=''; return; }
+  const isEth = val.startsWith('0x') || val.startsWith('0X');
+  const isValidEth = isEth && /^0x[0-9a-fA-F]{40}$/.test(val);
+  const isValidSol = !isEth && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(val);
+  if(!isValidEth && !isValidSol) {
     err.classList.add('show');
     input.style.borderColor = 'var(--red)';
   } else {
@@ -2554,8 +2596,13 @@ function validateInput(input){
 }
 
 function sanitizeAddress(addr){
-  // Strip anything that isnt base58
-  return addr.replace(/[^1-9A-HJ-NP-Za-km-z]/g, '').slice(0, 44);
+  const trimmed = addr.trim();
+  // ETH/Base address (0x...)
+  if(trimmed.startsWith('0x') || trimmed.startsWith('0X')) {
+    return trimmed.replace(/[^0-9a-fA-Fx]/g, '').slice(0, 42);
+  }
+  // Solana address (base58)
+  return trimmed.replace(/[^1-9A-HJ-NP-Za-km-z]/g, '').slice(0, 44);
 }
 
 function isValidSolanaAddress(addr){
