@@ -862,8 +862,8 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
   <h2 class="section-title fade-in">From wallet to trade in four steps.</h2>
   <div class="steps-grid">
     <div class="step-tile fade-in"><div class="step-n">STEP 01</div><div class="step-h">Paste any wallet</div><p class="step-p">Found an alpha wallet on GMGN, fomo.family, or CT. Drop it in. We pull real on-chain data from Solana mainnet.</p></div>
-    <div class="step-tile fade-in"><div class="step-n">STEP 02</div><div class="step-h">Real trade history</div><p class="step-p">See every recent trade, the token, amount, and estimated PnL. Know exactly how they made or lost money.</p></div>
-    <div class="step-tile fade-in"><div class="step-n">STEP 03</div><div class="step-h">Exact bot settings</div><p class="step-p">Gas, slippage, buy tax limit, sell tax limit, position size — calibrated to this wallet's specific behavior.</p></div>
+    <div class="step-tile fade-in"><div class="step-n">STEP 02</div><div class="step-h">Real trade history</div><p class="step-p">See every recent swap, the token, amount, and actual realized PnL pulled from on-chain data. Know exactly how they traded.</p></div>
+    <div class="step-tile fade-in"><div class="step-n">STEP 03</div><div class="step-h">Exact bot settings</div><p class="step-p">Buy gas, sell gas, buy slippage, sell slippage, buy tax limit, sell tax limit, min/max market cap — calibrated to this wallet's exact behavior.</p></div>
     <div class="step-tile fade-in"><div class="step-n">STEP 04</div><div class="step-h">Copy with confidence</div><p class="step-p">Plug directly into Banana Gun or Maestro. No guesswork. No missed trades from wrong settings.</p></div>
   </div>
 </section>
@@ -2199,7 +2199,7 @@ function buildFallback(onChain){
     ],
     config:{'Buy Gas':'5 GWEI','Sell Gas':'5 GWEI','Buy Slippage':'15%','Sell Slippage':'15%','Buy Tax Limit':'8%','Sell Tax Limit':'8%','Min Mkt Cap':'$50K','Max Mkt Cap':'$20M','Buy Amount':'0.01 SOL','Spending Limit':'0.5 SOL'},
     analysis:good
-      ?`This wallet shows a ${wr}% success rate across ${onChain?.totalTxns||'multiple'} on-chain transactions — strong signal for copy trading. Recent activity of ${onChain?.recentActivity||'several'} transactions confirms the wallet is actively trading. Start with 1-2% position size for one week before scaling.`
+      ?`This wallet shows a ${wr}% success rate across ${onChain?.totalTxns||'multiple'} on-chain transactions — strong signal for copy trading. Recent activity of ${onChain?.recentActivity||'several'} transactions confirms the wallet is actively trading. Start with a small buy amount for one week before scaling.`
       :`Success rate of ${wr}% across ${onChain?.totalTxns||'analyzed'} transactions is below the 65% threshold for confident copying. Watch for 14 days and only proceed if recent trade quality improves.`
   };
 }
