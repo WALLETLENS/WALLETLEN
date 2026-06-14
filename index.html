@@ -312,7 +312,12 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
   .wallet-input{font-size:0.72rem;}
   .analyze-btn{width:100%;padding:0.75rem;}
   
-  .wallet-header-card{flex-direction:column;gap:0.875rem;padding:1rem;}
+  .wallet-header-addr-row{display:flex;align-items:center;gap:6px;}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;color:var(--muted2);cursor:pointer;transition:all 0.15s;flex-shrink:0;background:transparent;border:none;text-decoration:none;}
+.icon-btn svg{width:13px;height:13px;}
+.icon-btn:hover{color:var(--accent);background:rgba(79,142,255,0.1);}
+.icon-btn.copied{color:var(--green);}
+.wallet-header-card{flex-direction:column;gap:0.875rem;padding:1rem;}
   .wallet-header-center{text-align:left;}
   .wallet-header-right{align-items:flex-start;flex-direction:row;flex-wrap:wrap;}
   .wallet-value-num{font-size:1.25rem;}
@@ -378,6 +383,11 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 }
 
 /* WALLET HEADER CARD */
+.wallet-header-addr-row{display:flex;align-items:center;gap:6px;}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;color:var(--muted2);cursor:pointer;transition:all 0.15s;flex-shrink:0;background:transparent;border:none;text-decoration:none;}
+.icon-btn svg{width:13px;height:13px;}
+.icon-btn:hover{color:var(--accent);background:rgba(79,142,255,0.1);}
+.icon-btn.copied{color:var(--green);}
 .wallet-header-card{background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
 .wallet-header-left{display:flex;align-items:center;gap:12px;}
 .wallet-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,0.1);}
@@ -525,8 +535,6 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 .input-error.show{display:block;}
 .rate-limit-banner{background:rgba(255,77,106,0.08);border:1px solid rgba(255,77,106,0.2);border-radius:10px;padding:0.75rem 1rem;margin-bottom:1rem;font-family:var(--mono);font-size:0.72rem;color:var(--red);display:none;}
 .rate-limit-banner.show{display:block;}
-.copy-addr{font-family:var(--mono);font-size:0.65rem;color:var(--accent);cursor:pointer;text-decoration:underline;margin-left:8px;opacity:0.7;}
-.copy-addr:hover{opacity:1;}
 .security-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:0.62rem;color:var(--muted2);margin-top:0.5rem;}
 </style>
 </head>
@@ -663,8 +671,19 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
           <div class="wallet-header-left">
             <div class="wallet-avatar" id="walletAvatar">??</div>
             <div class="wallet-header-info">
-              <div class="wallet-header-name" id="walletName">— <span id="copyAddrBtn" class="copy-addr" onclick="copyAddress(document.getElementById('walletInput').value.trim())" style="display:none;">Copy</span></div>
-              <div class="wallet-header-addr" id="walletAddr">—</div>
+              <div class="wallet-header-name" id="walletName">—</div>
+              <div class="wallet-header-addr-row">
+                <span class="wallet-header-addr" id="walletAddr">—</span>
+                <button class="icon-btn" id="copyAddrIcon" onclick="copyWalletAddress()" title="Copy address" style="display:none;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+                <a class="icon-btn" id="iconExplorer" href="#" target="_blank" rel="noopener" title="View on explorer" style="display:none;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                </a>
+                <a class="icon-btn" id="iconGmgn" href="#" target="_blank" rel="noopener" title="View on GMGN" style="display:none;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                </a>
+              </div>
             </div>
           </div>
           <div class="wallet-header-center">
@@ -681,7 +700,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
           </div>
         </div>
 
-        <!-- TAB NAV -->
+<!-- TAB NAV -->
         <div class="result-tabs">
           <button class="result-tab active" onclick="switchResultTab(this,'tabOverview')">Overview</button>
           <button class="result-tab" onclick="switchResultTab(this,'tabAnalytics')">Analytics</button>
@@ -3032,10 +3051,19 @@ function renderResults(data,addr,onChain){
   // Wallet header
   const initials=addr.slice(0,2).toUpperCase();
   setWalletAvatar(addr);
-  const copyBtn=document.getElementById('copyAddrBtn');
-  if(copyBtn)copyBtn.style.display='inline';
   document.getElementById('walletName').textContent=addr.slice(0,6)+'...'+addr.slice(-6);
   document.getElementById('walletAddr').textContent=esc(addr);
+
+  // Wire icon row (copy, explorer, GMGN)
+  const c=activeChain;
+  const explorerUrlIcon=c==='eth'?'https://etherscan.io/address/'+addr:c==='base'?'https://basescan.org/address/'+addr:'https://solscan.io/account/'+addr;
+  const gmgnUrlIcon=c==='eth'?'https://gmgn.ai/eth/address/'+addr:c==='base'?'https://gmgn.ai/base/address/'+addr:'https://gmgn.ai/sol/address/'+addr;
+  const copyIcon=document.getElementById('copyAddrIcon');
+  const explorerIcon=document.getElementById('iconExplorer');
+  const gmgnIcon=document.getElementById('iconGmgn');
+  if(copyIcon)copyIcon.style.display='inline-flex';
+  if(explorerIcon){explorerIcon.style.display='inline-flex';explorerIcon.href=explorerUrlIcon;}
+  if(gmgnIcon){gmgnIcon.style.display='inline-flex';gmgnIcon.href=gmgnUrlIcon;}
 
   // Balance
   const bal=onChain?.solBalance||'—';
@@ -3449,10 +3477,15 @@ function isValidSolanaAddress(addr){
   return base58Regex.test(addr);
 }
 
-function copyAddress(addr){
-  navigator.clipboard.writeText(addr).then(()=>{
-    const el = document.getElementById('copyAddrBtn');
-    if(el){ el.textContent = 'Copied!'; setTimeout(()=>el.textContent='Copy', 1500); }
+function copyWalletAddress(){
+  if(!lastAnalysis || !lastAnalysis.addr) return;
+  navigator.clipboard.writeText(lastAnalysis.addr).then(()=>{
+    const btn = document.getElementById('copyAddrIcon');
+    if(!btn) return;
+    const original = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    setTimeout(()=>{ btn.classList.remove('copied'); btn.innerHTML = original; }, 1200);
   });
 }
 
