@@ -2030,8 +2030,29 @@ Respond ONLY with valid JSON, no markdown:
 }
 
 function buildFallback(onChain){
-  const wr=onChain?onChain.winRate:55;
-  const score=onChain?onChain.score:50;
+  // NO DATA CASE: wallet has zero on-chain activity or RPC completely failed
+  if(!onChain || !onChain.totalTxns || onChain.totalTxns === 0){
+    return{
+      score:0,scoreColor:'#6b7280',
+      verdict:'NO DATA',verdictClass:'v-watch',
+      noData:true,
+      metrics:[
+        {label:'TRACKER COUNT',value:'—',color:'c-white'},
+        {label:'AVG BUY SIZE',value:'—',color:'c-white'},
+        {label:'ACTIVITY (7D)',value:'0 txns',color:'c-white'},
+        {label:'BALANCE',value:(onChain?.solBalance||'0')+' '+(activeChain==='sol'?'SOL':'ETH'),color:'c-white'},
+        {label:'WALLET AGE',value:'—',color:'c-white'},
+        {label:'AVG HOLD TIME',value:'—',color:'c-white'},
+        {label:'TOTAL TRADES',value:'0',color:'c-white'},
+        {label:'FAILED TXN %',value:'—',color:'c-white'}
+      ],
+      config:{'Buy Gas':'—','Sell Gas':'—','Buy Slippage':'—','Sell Slippage':'—','Buy Tax Limit':'—','Sell Tax Limit':'—','Min Mkt Cap':'—','Max Mkt Cap':'—','Buy Amount':'—','Spending Limit':'—'},
+      analysis:`This wallet has no on-chain transaction history on ${CHAINS[activeChain].name}. It may be a newly created wallet, an unused address, or the address may be incorrect. There's nothing to analyze — double-check the address or try a wallet with trading activity.`
+    };
+  }
+
+  const wr=onChain.winRate;
+  const score=onChain.score;
   const good=score>=65;
   return{
     score,scoreColor:score>=70?'#00d68f':score>=50?'#ffb547':'#ff4d6a',
@@ -2040,18 +2061,89 @@ function buildFallback(onChain){
     metrics:[
       {label:'TRACKER COUNT',value:String(Math.min(15,Math.floor(score/10))),color:score>70?'c-green':score>50?'c-amber':'c-red'},
       {label:'AVG BUY SIZE',value:'0.50 SOL',color:'c-blue'},
-      {label:'ACTIVITY (7D)',value:(onChain?.recentActivity||'—')+' txns',color:'c-white'},
-      {label:'SOL BALANCE',value:(onChain?.solBalance||'—')+' SOL',color:'c-blue'},
-      {label:'WALLET AGE',value:(onChain?.ageInDays||'—')+'d',color:'c-white'},
-      {label:'AVG HOLD TIME',value:(onChain?.holdTimeStr||'—'),color:'c-white'},
-      {label:'TOTAL TRADES',value:String(onChain?.totalTxns||'—'),color:'c-white'},
-      {label:'FAILED TXN %',value:onChain?Math.round((onChain.failedTxns/Math.max(1,onChain.totalTxns))*100)+'%':'—',color:onChain&&(onChain.failedTxns/Math.max(1,onChain.totalTxns))<0.1?'c-green':'c-amber'}
+      {label:'ACTIVITY (7D)',value:onChain.recentActivity+' txns',color:'c-white'},
+      {label:'SOL BALANCE',value:onChain.solBalance+' SOL',color:'c-blue'},
+      {label:'WALLET AGE',value:onChain.ageInDays+'d',color:'c-white'},
+      {label:'AVG HOLD TIME',value:onChain.holdTimeStr,color:'c-white'},
+      {label:'TOTAL TRADES',value:String(onChain.totalTxns),color:'c-white'},
+      {label:'FAILED TXN %',value:Math.round((onChain.failedTxns/Math.max(1,onChain.totalTxns))*100)+'%',color:(onChain.failedTxns/Math.max(1,onChain.totalTxns))<0.1?'c-green':'c-amber'}
     ],
     config:{'Buy Gas':'5 GWEI','Sell Gas':'5 GWEI','Buy Slippage':'15%','Sell Slippage':'15%','Buy Tax Limit':'8%','Sell Tax Limit':'8%','Min Mkt Cap':'$50K','Max Mkt Cap':'$20M','Buy Amount':'0.01 SOL','Spending Limit':'0.5 SOL'},
     analysis:good
-      ?`This wallet shows a ${wr}% success rate across ${onChain?.totalTxns||'multiple'} on-chain transactions — strong signal for copy trading. Recent activity of ${onChain?.recentActivity||'several'} transactions confirms the wallet is actively trading. Start with a small buy amount for one week before scaling.`
-      :`Success rate of ${wr}% across ${onChain?.totalTxns||'analyzed'} transactions is below the 65% threshold for confident copying. Watch for 14 days and only proceed if recent trade quality improves.`
+      ?`This wallet shows a ${wr}% success rate across ${onChain.totalTxns} on-chain transactions — strong signal for copy trading. Recent activity of ${onChain.recentActivity} transactions confirms the wallet is actively trading. Start with a small buy amount for one week before scaling.`
+      :`Success rate of ${wr}% across ${onChain.totalTxns} transactions is below the 65% threshold for confident copying. Watch for 14 days and only proceed if recent trade quality improves.`
   };
+}
+
+// WALLET SENTIMENT + BOT SPEED (shown in analyzer results)
+function renderSentimentAndSpeed(onChain) {
+  const sentimentBox = document.getElementById('sentimentBox');
+  const speedBox = document.getElementById('speedCompatBox');
+
+  if(!onChain || !onChain.totalTxns) {
+    if(sentimentBox) sentimentBox.style.display = 'none';
+    if(speedBox) speedBox.style.display = 'none';
+    return;
+  }
+
+  // SENTIMENT: based on ratio of recent vs older activity
+  const recentRatio = onChain.totalTxns > 0 ? (onChain.recentActivity / onChain.totalTxns) : 0;
+  const successRatio = onChain.winRate / 100;
+  const sentimentScore = Math.round((recentRatio * 0.5 + successRatio * 0.5) * 100);
+  const sentimentPct = Math.min(95, Math.max(5, sentimentScore));
+
+  const sentimentLabel = sentimentPct > 70 ? 'Greed — Active Buying' :
+    sentimentPct > 55 ? 'Neutral — Mixed Activity' :
+    sentimentPct > 35 ? 'Caution — Slowing Down' : 'Fear — Taking Profits';
+
+  const sentimentColor = sentimentPct > 70 ? 'var(--green)' :
+    sentimentPct > 55 ? '#a78bfa' :
+    sentimentPct > 35 ? 'var(--amber)' : 'var(--red)';
+
+  const sentimentDesc = sentimentPct > 70
+    ? 'Wallet is in active buying mode — high recent activity and strong success rate. Good time to copy.'
+    : sentimentPct > 55
+    ? 'Wallet showing mixed signals — some buying, some profit taking. Proceed with normal caution.'
+    : sentimentPct > 35
+    ? 'Wallet activity slowing — may be shifting to profit taking mode. Monitor before copying.'
+    : 'Wallet appears to be exiting positions — low recent activity and high failure rate. Avoid copying right now.';
+
+  if(sentimentBox) sentimentBox.style.display = 'block';
+  const sl = document.getElementById('sentimentLabel');
+  if(sl){ sl.textContent = sentimentLabel; sl.style.color = sentimentColor; }
+  const sf = document.getElementById('sentimentFill');
+  if(sf){ sf.style.width = sentimentPct + '%'; sf.style.background = sentimentColor; }
+  const sd = document.getElementById('sentimentDesc');
+  if(sd) sd.textContent = sentimentDesc;
+
+  // BOT SPEED COMPATIBILITY
+  const holdMins = onChain.avgHoldMins || 60;
+  const bots = [
+    { name: 'Banana Gun', minMins: 1, compat: holdMins >= 1 ? Math.min(100, Math.round((holdMins/5)*30+40)) : 20 },
+    { name: 'Maestro', minMins: 1, compat: holdMins >= 1 ? Math.min(100, Math.round((holdMins/5)*25+45)) : 25 },
+    { name: 'Trojan', minMins: 0.5, compat: holdMins >= 0.5 ? Math.min(100, Math.round((holdMins/3)*30+40)) : 30 },
+    { name: 'BonkBot', minMins: 2, compat: holdMins >= 2 ? Math.min(100, Math.round((holdMins/8)*25+40)) : 15 },
+  ];
+
+  const warning = holdMins < 2
+    ? '⚡ This wallet trades extremely fast. Standard gas may cause missed trades.'
+    : holdMins < 10
+    ? '🔥 Fast trader. Use high gas settings to keep up.'
+    : '✓ Hold time is compatible with standard bot settings.';
+
+  if(speedBox) speedBox.style.display = 'block';
+  const sw = document.getElementById('speedWarning');
+  if(sw) sw.textContent = warning;
+  const sb = document.getElementById('speedBars');
+  if(sb) sb.innerHTML = bots.map(b => `
+    <div class="speed-bar-row">
+      <div class="speed-bar-label">${b.name}</div>
+      <div class="speed-bar-track">
+        <div class="speed-bar-fill" style="width:${b.compat}%;background:${b.compat>=70?'var(--green)':b.compat>=45?'var(--amber)':'var(--red)'};"></div>
+      </div>
+      <div class="speed-bar-pct">${b.compat}%</div>
+    </div>
+  `).join('');
 }
 
 function renderResults(data,addr,onChain){
@@ -2081,49 +2173,71 @@ function renderResults(data,addr,onChain){
   // Score ring (r=33, circ=207.3)
   const arc=document.getElementById('scoreArc');
   arc.style.stroke=data.scoreColor;
-  arc.style.strokeDashoffset=207.3-(data.score/100)*207.3;
-  document.getElementById('scoreDisplay').textContent=data.score;
+  arc.style.strokeDashoffset=data.noData?207.3:207.3-(data.score/100)*207.3;
+  document.getElementById('scoreDisplay').textContent=data.noData?'—':data.score;
   document.getElementById('scoreDisplay').style.color=data.scoreColor;
 
   // Verdict pill
   const vp=document.getElementById('verdictPill');
   vp.textContent=data.verdict;vp.className='verdict-pill '+data.verdictClass;
+  if(data.noData){vp.style.color='#6b7280';vp.style.background='rgba(107,114,128,0.12)';vp.style.borderColor='rgba(107,114,128,0.25)';}
 
   // Overview verdict text
   const ov=document.getElementById('overviewVerdict');
   if(ov){ov.textContent=data.verdict;ov.style.color=data.scoreColor;}
   const ovs=document.getElementById('overviewVerdictSub');
-  if(ovs)ovs.textContent=data.score>=72?'High confidence copy candidate.':data.score>=52?'Watch this wallet — verify before copying.':'Low score — avoid copying right now.';
+  if(ovs)ovs.textContent=data.noData?'No on-chain transaction history found for this wallet.':data.score>=72?'High confidence copy candidate.':data.score>=52?'Watch this wallet — verify before copying.':'Low score — avoid copying right now.';
 
   // Win rate card
-  const wr=onChain?.winRate||parseInt(data.metrics?.[0]?.value)||50;
   const wrEl=document.getElementById('overviewWinRate');
-  if(wrEl){wrEl.textContent=wr+'%';wrEl.style.color=wr>=65?'var(--green)':wr>=50?'var(--amber)':'var(--red)';}
   const wrf=document.getElementById('winRateFill');
-  if(wrf){wrf.style.width=wr+'%';wrf.style.background=wr>=65?'var(--green)':wr>=50?'var(--amber)':'var(--red)';}
   const wrsub=document.getElementById('overviewWinRateSub');
-  if(wrsub)wrsub.textContent=onChain?(onChain.successTxns+' successful / '+onChain.totalTxns+' total'):'Based on transaction analysis';
+  if(data.noData){
+    if(wrEl){wrEl.textContent='—';wrEl.style.color='var(--muted2)';}
+    if(wrf){wrf.style.width='0%';}
+    if(wrsub)wrsub.textContent='No transactions to analyze';
+  } else {
+    const wr=onChain.winRate;
+    if(wrEl){wrEl.textContent=wr+'%';wrEl.style.color=wr>=65?'var(--green)':wr>=50?'var(--amber)':'var(--red)';}
+    if(wrf){wrf.style.width=wr+'%';wrf.style.background=wr>=65?'var(--green)':wr>=50?'var(--amber)':'var(--red)';}
+    if(wrsub)wrsub.textContent=onChain.successTxns+' successful / '+onChain.totalTxns+' total';
+  }
 
   // PnL summary
-  const tp=onChain?.totalPnl||0;
   const pnlEl=document.getElementById('ovPnlTotal');
-  if(pnlEl){pnlEl.textContent=tp>=0?'+$'+Math.abs(tp).toFixed(0):'-$'+Math.abs(tp).toFixed(0);pnlEl.style.color=tp>=0?'var(--green)':'var(--red)';}
   const bestEl=document.getElementById('ovPnlBest');
-  if(bestEl)bestEl.textContent=onChain?.bestTrade?'+$'+onChain.bestTrade.toFixed(0):'—';
   const worstEl=document.getElementById('ovPnlWorst');
-  if(worstEl)worstEl.textContent=onChain?.worstTrade?'-$'+Math.abs(onChain.worstTrade).toFixed(0):'—';
-  const avgPnl=onChain?.completedTrades?.length?tp/onChain.completedTrades.length:0;
   const avgEl=document.getElementById('ovPnlAvg');
-  if(avgEl){avgEl.textContent=avgPnl!==0?(avgPnl>=0?'+$'+avgPnl.toFixed(0):'-$'+Math.abs(avgPnl).toFixed(0)):'—';avgEl.style.color=avgPnl>=0?'var(--green)':'var(--red)';}
+  if(data.noData){
+    if(pnlEl){pnlEl.textContent='—';pnlEl.style.color='var(--text)';}
+    if(bestEl)bestEl.textContent='—';
+    if(worstEl)worstEl.textContent='—';
+    if(avgEl){avgEl.textContent='—';avgEl.style.color='var(--text)';}
+  } else {
+    const tp=onChain.totalPnl||0;
+    if(pnlEl){pnlEl.textContent=tp>=0?'+$'+Math.abs(tp).toFixed(0):'-$'+Math.abs(tp).toFixed(0);pnlEl.style.color=tp>=0?'var(--green)':'var(--red)';}
+    if(bestEl)bestEl.textContent=onChain.bestTrade?'+$'+onChain.bestTrade.toFixed(0):'—';
+    if(worstEl)worstEl.textContent=onChain.worstTrade?'-$'+Math.abs(onChain.worstTrade).toFixed(0):'—';
+    const avgPnl=onChain.completedTrades?.length?tp/onChain.completedTrades.length:0;
+    if(avgEl){avgEl.textContent=avgPnl!==0?(avgPnl>=0?'+$'+avgPnl.toFixed(0):'-$'+Math.abs(avgPnl).toFixed(0)):'—';avgEl.style.color=avgPnl>=0?'var(--green)':'var(--red)';}
+  }
 
   // Risk signals
-  const rugPct=onChain?Math.min(99,Math.round((onChain.failedTxns/Math.max(1,onChain.totalTxns))*100)):0;
   const riskEl=document.getElementById('riskRows');
-  if(riskEl)riskEl.innerHTML=`
-    <div class="risk-row"><span class="risk-row-label">Failed Txns</span><span class="risk-row-val" style="color:${rugPct>20?'var(--red)':rugPct>10?'var(--amber)':'var(--green)'}">${rugPct}%</span></div>
-    <div class="risk-row"><span class="risk-row-label">Copy Pattern</span><span class="risk-row-val" style="color:${onChain?.isCopyTrader?'var(--amber)':'var(--green)'}">${onChain?.isCopyTrader?'Detected':'Not detected'}</span></div>
-    <div class="risk-row"><span class="risk-row-label">Wallet Age</span><span class="risk-row-val" style="color:${(onChain?.ageInDays||0)>30?'var(--green)':(onChain?.ageInDays||0)>7?'var(--amber)':'var(--red)'}">${onChain?.ageInDays||'—'}d</span></div>
-    <div class="risk-row"><span class="risk-row-label">Recency</span><span class="risk-row-val" style="color:${(onChain?.recentActivity||0)>5?'var(--green)':'var(--amber)'}">${onChain?.recencyLabel||'—'}</span></div>`;
+  if(data.noData){
+    if(riskEl)riskEl.innerHTML=`
+      <div class="risk-row"><span class="risk-row-label">Failed Txns</span><span class="risk-row-val" style="color:var(--muted2)">—</span></div>
+      <div class="risk-row"><span class="risk-row-label">Copy Pattern</span><span class="risk-row-val" style="color:var(--muted2)">—</span></div>
+      <div class="risk-row"><span class="risk-row-label">Wallet Age</span><span class="risk-row-val" style="color:var(--muted2)">—</span></div>
+      <div class="risk-row"><span class="risk-row-label">Recency</span><span class="risk-row-val" style="color:var(--muted2)">—</span></div>`;
+  } else {
+    const rugPct=Math.min(99,Math.round((onChain.failedTxns/Math.max(1,onChain.totalTxns))*100));
+    if(riskEl)riskEl.innerHTML=`
+      <div class="risk-row"><span class="risk-row-label">Failed Txns</span><span class="risk-row-val" style="color:${rugPct>20?'var(--red)':rugPct>10?'var(--amber)':'var(--green)'}">${rugPct}%</span></div>
+      <div class="risk-row"><span class="risk-row-label">Copy Pattern</span><span class="risk-row-val" style="color:${onChain.isCopyTrader?'var(--amber)':'var(--green)'}">${onChain.isCopyTrader?'Detected':'Not detected'}</span></div>
+      <div class="risk-row"><span class="risk-row-label">Wallet Age</span><span class="risk-row-val" style="color:${onChain.ageInDays>30?'var(--green)':onChain.ageInDays>7?'var(--amber)':'var(--red)'}">${onChain.ageInDays}d</span></div>
+      <div class="risk-row"><span class="risk-row-label">Recency</span><span class="risk-row-val" style="color:${onChain.recentActivity>5?'var(--green)':'var(--amber)'}">${onChain.recencyLabel}</span></div>`;
+  }
 
   // Metrics strip
   document.getElementById('metricsGrid').innerHTML=data.metrics.map(m=>`<div class="metric-tile"><div class="m-label">${m.label}</div><div class="m-value ${m.color}">${m.value}</div></div>`).join('');
