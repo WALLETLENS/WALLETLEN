@@ -402,7 +402,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 .overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:1rem;}
 .overview-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.1rem;position:relative;}
 .overview-card-title{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.875rem;}
-.overview-score-row{display:flex;align-items:center;gap:1rem;}
+.overview-score-row{display:flex;align-items:center;justify-content:center;gap:1rem;text-align:left;}
 .overview-score-info{}
 .overview-score-label{font-family:var(--mono);font-size:0.68rem;color:var(--muted2);}
 
@@ -1662,6 +1662,16 @@ function resetAnalyzer(){
   });
 }
 
+
+function formatNum(n) {
+  const num = parseFloat(n);
+  if(isNaN(num)) return n;
+  let str = num.toFixed(4).replace(/\.?0+$/, '');
+  const parts = str.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
+}
+
 function esc(str) {
   return String(str)
     .replace(/&/g,'&amp;')
@@ -2905,7 +2915,7 @@ function buildFallback(onChain){
         {label:'TRACKER COUNT',value:'—',color:'c-white'},
         {label:'AVG BUY SIZE',value:'—',color:'c-white'},
         {label:'ACTIVITY (7D)',value:'0 txns',color:'c-white'},
-        {label:'BALANCE',value:(onChain?.solBalance||'0')+' '+(activeChain==='sol'?'SOL':'ETH'),color:'c-white'},
+        {label:'BALANCE',value:formatNum(onChain?.solBalance||'0')+' '+(activeChain==='sol'?'SOL':'ETH'),color:'c-white'},
         {label:'WALLET AGE',value:'—',color:'c-white'},
         {label:'AVG HOLD TIME',value:'—',color:'c-white'},
         {label:'TOTAL TRADES',value:'0',color:'c-white'},
@@ -2927,7 +2937,7 @@ function buildFallback(onChain){
       {label:'TRACKER COUNT',value:String(Math.min(15,Math.floor(score/10))),color:score>70?'c-green':score>50?'c-amber':'c-red'},
       {label:'AVG BUY SIZE',value:'0.50 SOL',color:'c-blue'},
       {label:'ACTIVITY (7D)',value:onChain.recentActivity+' txns',color:'c-white'},
-      {label:'SOL BALANCE',value:onChain.solBalance+' SOL',color:'c-blue'},
+      {label:'SOL BALANCE',value:formatNum(onChain.solBalance)+' SOL',color:'c-blue'},
       {label:'WALLET AGE',value:onChain.ageInDays+'d',color:'c-white'},
       {label:'AVG HOLD TIME',value:onChain.holdTimeStr,color:'c-white'},
       {label:'TOTAL TRADES',value:String(onChain.totalTxns),color:'c-white'},
@@ -3031,7 +3041,7 @@ function renderResults(data,addr,onChain){
   const bal=onChain?.solBalance||'—';
   const unit=activeChain==='sol'?'SOL':'ETH';
   const wbal=document.getElementById('walletBalance');
-  if(wbal){wbal.textContent=bal!=='—'?bal+' '+unit:'—';wbal.style.color='var(--text)';}
+  if(wbal){wbal.textContent=bal!=='—'?formatNum(bal)+' '+unit:'—';wbal.style.color='var(--text)';}
   const wsub=document.getElementById('walletBalanceSub');
   if(wsub)wsub.textContent=onChain?(onChain.totalTxns+' transactions · '+(onChain.ageInDays||0)+'d wallet age'):'';
 
