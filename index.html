@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net; connect-src 'self' *.quiknode.pro api.anthropic.com api.rugcheck.xyz fe-cache.jup.ag public-api.solscan.io eth.llamarpc.com base.llamarpc.com formspree.io *.vercel-insights.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net; connect-src 'self' *.quiknode.pro api.anthropic.com api.rugcheck.xyz api.dexscreener.com eth.llamarpc.com base.llamarpc.com api.etherscan.io api.basescan.org formspree.io *.vercel-insights.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com;">
 <meta name="description" content="WalletLens — Real on-chain wallet intelligence for Solana, Ethereum and Base. Analyze any wallet, get copy pattern detection, trade history, PnL, and exact Banana Gun bot settings. Free.">
 <meta property="og:title" content="WalletLens — On-Chain Wallet Intelligence">
 <meta property="og:description" content="Analyze any wallet on Solana, Ethereum or Base. Real blockchain data, copy pattern detection, and exact bot settings. Free.">
@@ -19,6 +19,23 @@
 <meta name="twitter:description" content="Analyze any wallet on Solana, Ethereum or Base. Real blockchain data + exact bot settings. Free.">
 <meta name="twitter:image" content="https://walletlens.dev/og-image.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<link rel="canonical" href="https://walletlens.dev">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "WalletLens",
+  "url": "https://walletlens.dev",
+  "description": "Real on-chain wallet intelligence for Solana, Ethereum and Base. Analyze any wallet, get copy pattern detection, trade history, PnL, and exact bot settings.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
 <title>WalletLens — On-Chain Wallet Intelligence for Solana, Ethereum & Base</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080910'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%234f8eff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='none' stroke='%234f8eff' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%234f8eff'/%3E%3Cline x1='16' y1='5' x2='16' y2='11' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='16' y1='21' x2='16' y2='27' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='5' y1='16' x2='11' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='21' y1='16' x2='27' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080910'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%234f8eff' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='none' stroke='%234f8eff' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%234f8eff'/%3E%3Cline x1='16' y1='5' x2='16' y2='11' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='16' y1='21' x2='16' y2='27' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='5' y1='16' x2='11' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='21' y1='16' x2='27' y2='16' stroke='%234f8eff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -1029,6 +1046,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
   <div class="section-eyebrow" style="justify-content:center;display:flex;">YOUR WATCHLIST</div>
   <h2 class="section-title fade-in" style="text-align:center;">Saved wallets.</h2>
   <p class="section-desc fade-in" style="text-align:center;margin:0 auto 2rem;">Wallets you've bookmarked for tracking. Stored locally in your browser.</p>
+  <div class="metrics-grid fade-in" id="watchlistSummary" style="max-width:700px;margin:0 auto 2rem;"></div>
   <div class="hof-grid fade-in" id="watchlistGrid"></div>
 </section>
 
@@ -1399,20 +1417,21 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
       <ul class="plan-feats">
         <li><div class="feat-check"></div>Real on-chain data (SOL, ETH, Base)</li>
         <li><div class="feat-check"></div>Full wallet score & verdict</li>
-        <li><div class="feat-check"></div>Trade history & PnL breakdown</li>
+        <li><div class="feat-check"></div>Real trade history & live PnL</li>
         <li><div class="feat-check"></div>Activity chart (1D/7D/30D)</li>
         <li><div class="feat-check"></div>Copy pattern detection</li>
         <li><div class="feat-check"></div>Hold time & trader style</li>
-        <li><div class="feat-check"></div>Recency score</li>
-        <li><div class="feat-check"></div>Exact Banana Gun settings</li>
-        <li><div class="feat-check"></div>Live wallet leaderboard</li>
+        <li><div class="feat-check"></div>Wallet comparison tool</li>
+        <li><div class="feat-check"></div>Token safety scanner</li>
+        <li><div class="feat-check"></div>Personal watchlist & portfolio view</li>
+        <li><div class="feat-check"></div>Accuracy-based bot configs</li>
       </ul>
       <button class="plan-btn plan-btn-outline" onclick="showTool('analyzer')">Start Analyzing Free →</button>
     </div>
 
     <div style="margin-top:1.5rem;background:var(--bg2);border:1px solid rgba(79,142,255,0.2);border-radius:16px;padding:1.75rem;text-align:left;">
       <div style="font-family:var(--mono);font-size:0.68rem;color:var(--accent);letter-spacing:0.1em;margin-bottom:0.75rem;">PRO — COMING SOON</div>
-      <p style="font-size:0.9rem;color:var(--muted);line-height:1.7;margin-bottom:1.25rem;">Unlimited analyses, Telegram wallet alerts, cold wallet detection, multi-wallet watchlist, and more. Join the waitlist to get notified first and lock in early pricing.</p>
+      <p style="font-size:0.9rem;color:var(--muted);line-height:1.7;margin-bottom:1.25rem;">Unlimited daily analyses, real-time Telegram alerts when your watchlist wallets trade, and priority RPC access for instant results. Join the waitlist to get notified first and lock in early pricing.</p>
       <div style="display:flex;gap:8px;">
         <input id="waitlistEmail" type="email" placeholder="your@email.com" style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:0.75rem 1rem;color:var(--text);font-family:var(--mono);font-size:0.8rem;outline:none;min-width:0;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"/>
         <button onclick="joinWaitlist()" style="background:var(--accent);color:#fff;border:none;padding:0.75rem 1.25rem;border-radius:8px;font-family:var(--sans);font-weight:600;font-size:0.875rem;cursor:pointer;white-space:nowrap;">Join Waitlist</button>
@@ -1830,6 +1849,26 @@ function renderWatchlist() {
 
   if(section) section.style.display = 'block';
   if(divider) divider.style.display = 'block';
+
+  // Portfolio summary stats across all saved wallets
+  const summaryEl = document.getElementById('watchlistSummary');
+  if(summaryEl) {
+    const avgScore = Math.round(list.reduce((a,w) => a + (w.score||0), 0) / list.length);
+    const avgWinRate = Math.round(list.reduce((a,w) => a + (w.winRate||0), 0) / list.length);
+    const copyNowCount = list.filter(w => w.score >= 72).length;
+    const chainCounts = {sol:0, eth:0, base:0};
+    list.forEach(w => { if(chainCounts[w.chain] !== undefined) chainCounts[w.chain]++; });
+    const topChain = Object.entries(chainCounts).sort((a,b)=>b[1]-a[1])[0];
+    const chainLabel = {sol:'Solana', eth:'Ethereum', base:'Base'}[topChain[0]] || '—';
+
+    summaryEl.innerHTML = `
+      <div class="metric-tile"><div class="m-label">Saved Wallets</div><div class="m-value c-white">${list.length}</div></div>
+      <div class="metric-tile"><div class="m-label">Avg Score</div><div class="m-value ${avgScore>=70?'c-green':avgScore>=50?'c-amber':'c-red'}">${avgScore}/100</div></div>
+      <div class="metric-tile"><div class="m-label">Avg Win Rate</div><div class="m-value ${avgWinRate>=65?'c-green':avgWinRate>=50?'c-amber':'c-red'}">${avgWinRate}%</div></div>
+      <div class="metric-tile"><div class="m-label">Copy-Worthy</div><div class="m-value c-green">${copyNowCount} of ${list.length}</div></div>
+      <div class="metric-tile"><div class="m-label">Top Chain</div><div class="m-value c-blue">${chainLabel}</div></div>
+    `;
+  }
 
   const chainColors = {sol:'#9945ff', eth:'#627eea', base:'#0052ff'};
   const chainNames = {sol:'Solana', eth:'Ethereum', base:'Base'};
@@ -2504,8 +2543,37 @@ async function advanceStep(id,prevId){
 }
 
 async function rpc(method,params){
-  const SOL_RPC = 'https://cosmopolitan-tiniest-arm.solana-mainnet.quiknode.pro/ac776064cb8c9f4331d354e5a00fb531af49988c/';
-  const endpoint = activeChain === 'sol' ? SOL_RPC : CHAINS[activeChain]?.rpc;
+  // For Solana: try the protected backend proxy first (hides API key, adds rate limiting + caching)
+  if(activeChain === 'sol') {
+    try {
+      const res = await fetch('/api/rpc', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({method,params})
+      });
+      if(res.ok) {
+        const json = await res.json();
+        if(!json.error) return json.result;
+        if(json.error) throw new Error(json.error.message||'RPC error');
+      }
+      // Proxy returned non-OK status — fall through to direct RPC below
+      throw new Error('proxy unavailable');
+    } catch(proxyErr) {
+      // Proxy failed (not deployed, network issue, etc) — fall back to direct RPC so the site never fully breaks
+      const SOL_RPC = 'https://cosmopolitan-tiniest-arm.solana-mainnet.quiknode.pro/ac776064cb8c9f4331d354e5a00fb531af49988c/';
+      const res = await fetch(SOL_RPC, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})
+      });
+      const json = await res.json();
+      if(json.error) throw new Error(json.error.message||'RPC error');
+      return json.result;
+    }
+  }
+
+  // ETH/Base: direct RPC (no proxy needed, these are free public endpoints)
+  const endpoint = CHAINS[activeChain]?.rpc;
   const res = await fetch(endpoint, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -2703,7 +2771,7 @@ async function fetchOnChainData(wallet){
     const ageScore=Math.min(15,ageInDays>30?15:ageInDays>14?10:5);
     const score=Math.max(10,Math.min(95,trackerScore+activityScore+winRateScore+balanceScore+ageScore));
 
-    // Fetch REAL swap history from Jupiter API
+    // Fetch REAL swap history by parsing actual transaction data + DexScreener prices
     let trades = [];
     let tradeWinRate = winRate;
     let totalPnl = 0;
@@ -2712,63 +2780,100 @@ async function fetchOnChainData(wallet){
     let completedTrades = [];
 
     try {
-      const jupRes = await fetch(
-        `https://fe-cache.jup.ag/portfolio/walletPnl?wallet=${wallet}`,
-        { headers: { 'Accept': 'application/json' } }
-      );
-      if(jupRes.ok) {
-        const jupData = await jupRes.json();
-        const tokens = jupData?.tokens || jupData?.data || [];
-        if(tokens.length > 0) {
-          trades = tokens.slice(0, 15).map(t => {
-            const pnlNum = t.pnl || t.realizedPnl || 0;
-            const timeAgo = t.lastTrade ? Math.floor((Date.now()/1000 - t.lastTrade)/3600) : 0;
-            return {
-              time: timeAgo < 1 ? '<1h ago' : timeAgo < 24 ? timeAgo+'h ago' : Math.floor(timeAgo/24)+'d ago',
-              type: pnlNum >= 0 ? 'SELL' : 'SELL',
-              token: t.symbol || t.mint?.slice(0,6)+'...' || 'Unknown',
-              amount: (t.volume || 0).toFixed(3)+' SOL',
-              pnl: pnlNum >= 0 ? '+$'+pnlNum.toFixed(0) : '-$'+Math.abs(pnlNum).toFixed(0),
-              pnlNum,
-              status: 'Closed',
-              sig: t.mint || ''
-            };
-          });
-          completedTrades = trades.filter(t => t.pnlNum !== 0);
-          const wins = completedTrades.filter(t => t.pnlNum > 0).length;
-          tradeWinRate = completedTrades.length > 0 ? Math.round((wins/completedTrades.length)*100) : winRate;
-          totalPnl = completedTrades.reduce((a,t) => a+t.pnlNum, 0);
-          bestTrade = completedTrades.length > 0 ? Math.max(...completedTrades.map(t=>t.pnlNum)) : 0;
-          worstTrade = completedTrades.length > 0 ? Math.min(...completedTrades.map(t=>t.pnlNum)) : 0;
-        }
+      // Pull parsed transaction details for the most recent signatures (max 15 to control RPC load)
+      const recentSigs = sigs.filter(s => !s.err).slice(0, 15);
+      const txDetails = [];
+      for(const sig of recentSigs) {
+        try {
+          const tx = await rpc('getTransaction', [sig.signature, {encoding:'jsonParsed', maxSupportedTransactionVersion:0}]);
+          if(tx) txDetails.push({sig, tx});
+        } catch(e) { /* skip individual failures */ }
       }
-    } catch(jupErr) {
-      // Jupiter unavailable - try Solscan public API
-      try {
-        const ssRes = await fetch(
-          `https://public-api.solscan.io/account/transactions?account=${wallet}&limit=20`,
-          { headers: { 'Accept': 'application/json' } }
-        );
-        if(ssRes.ok) {
-          const ssTxns = await ssRes.json();
-          trades = (ssTxns || []).slice(0,15).map((tx, i) => {
-            const timeAgo = Math.floor((Date.now()/1000 - tx.blockTime)/3600);
-            return {
-              time: timeAgo < 1 ? '<1h ago' : timeAgo < 24 ? timeAgo+'h ago' : Math.floor(timeAgo/24)+'d ago',
-              type: i%2===0 ? 'BUY' : 'SELL',
-              token: tx.tokenAddress?.slice(0,6)+'...' || 'SOL',
-              amount: ((tx.lamport||0)/1e9).toFixed(4)+' SOL',
-              pnl: '—',
-              pnlNum: 0,
-              status: tx.status === 'Success' ? 'Success' : 'Failed',
-              sig: tx.txHash || ''
-            };
-          });
-        }
-      } catch(e) {}
+
+      // Extract SPL token swaps: look for token balance changes in each transaction
+      const swapCandidates = [];
+      for(const {sig, tx} of txDetails) {
+        const pre = tx?.meta?.preTokenBalances || [];
+        const post = tx?.meta?.postTokenBalances || [];
+        if(pre.length === 0 && post.length === 0) continue;
+
+        // Find the token whose balance changed the most for this wallet
+        const changes = {};
+        post.forEach(p => {
+          if(p.owner !== wallet) return;
+          const preMatch = pre.find(q => q.accountIndex === p.accountIndex);
+          const preAmt = preMatch ? parseFloat(preMatch.uiTokenAmount.uiAmountString || 0) : 0;
+          const postAmt = parseFloat(p.uiTokenAmount.uiAmountString || 0);
+          const delta = postAmt - preAmt;
+          if(Math.abs(delta) > 0.000001) {
+            changes[p.mint] = (changes[p.mint] || 0) + delta;
+          }
+        });
+
+        const mints = Object.keys(changes);
+        if(mints.length === 0) continue;
+        // Use the largest absolute change as the primary swap token
+        const mint = mints.reduce((a,b) => Math.abs(changes[a]) > Math.abs(changes[b]) ? a : b);
+        const delta = changes[mint];
+
+        swapCandidates.push({
+          mint, delta,
+          isBuy: delta > 0,
+          blockTime: sig.blockTime,
+          signature: sig.signature
+        });
+      }
+
+      if(swapCandidates.length > 0) {
+        // Get live USD prices for the involved tokens via DexScreener (free, no key required)
+        const uniqueMints = [...new Set(swapCandidates.map(s => s.mint))].slice(0, 10);
+        const priceMap = {};
+        try {
+          const dsRes = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${uniqueMints.join(',')}`);
+          if(dsRes.ok) {
+            const dsData = await dsRes.json();
+            (dsData.pairs || []).forEach(p => {
+              if(p.baseToken?.address && !priceMap[p.baseToken.address]) {
+                priceMap[p.baseToken.address] = {
+                  price: parseFloat(p.priceUsd) || 0,
+                  symbol: p.baseToken.symbol || 'TOKEN'
+                };
+              }
+            });
+          }
+        } catch(e) { /* price lookup unavailable, fall back to amount-only display */ }
+
+        trades = swapCandidates.slice(0, 15).map(s => {
+          const priceInfo = priceMap[s.mint];
+          const timeAgo = Math.floor(Date.now()/1000 - s.blockTime);
+          const timeLabel = timeAgo < 3600 ? Math.floor(timeAgo/60)+'m ago' : timeAgo < 86400 ? Math.floor(timeAgo/3600)+'h ago' : Math.floor(timeAgo/86400)+'d ago';
+          const usdValue = priceInfo ? Math.abs(s.delta) * priceInfo.price : 0;
+          return {
+            time: timeLabel,
+            type: s.isBuy ? 'BUY' : 'SELL',
+            token: priceInfo?.symbol || s.mint.slice(0,4)+'...'+s.mint.slice(-4),
+            amount: Math.abs(s.delta).toFixed(Math.abs(s.delta) < 1 ? 4 : 2) + ' ' + (priceInfo?.symbol || 'tokens'),
+            pnl: priceInfo ? (s.isBuy ? '-$'+usdValue.toFixed(0) : '+$'+usdValue.toFixed(0)) : '—',
+            pnlNum: priceInfo ? (s.isBuy ? -usdValue : usdValue) : 0,
+            status: 'Success',
+            sig: s.signature
+          };
+        });
+
+        completedTrades = trades.filter(t => t.pnlNum !== 0);
+        const wins = completedTrades.filter(t => t.pnlNum > 0).length;
+        tradeWinRate = completedTrades.length > 0 ? Math.round((wins/completedTrades.length)*100) : winRate;
+        totalPnl = completedTrades.reduce((a,t) => a+t.pnlNum, 0);
+        bestTrade = completedTrades.length > 0 ? Math.max(...completedTrades.map(t=>t.pnlNum)) : 0;
+        worstTrade = completedTrades.length > 0 ? Math.min(...completedTrades.map(t=>t.pnlNum)) : 0;
+      }
+    } catch(swapErr) {
+      // Real parsing failed entirely — leave trades empty rather than show fake data
+      trades = [];
     }
 
-    // If no trade data from APIs, leave empty rather than fake
+    
+// If no trade data from APIs, leave empty rather than fake
     if(trades.length === 0) {
       trades = [];
       completedTrades = [];
@@ -2822,7 +2927,11 @@ async function runAnalysis(){
 
   // Check rate limit
   if(checkRateLimit()){
-    document.getElementById('rateLimitBanner').classList.add('show');
+    const banner = document.getElementById('rateLimitBanner');
+    if(banner){
+      banner.innerHTML = 'Free limit reached (20/day). <a href="#pricing" style="color:var(--accent);font-weight:600;">Join Pro waitlist</a> for unlimited.';
+      banner.classList.add('show');
+    }
     return;
   }
   document.getElementById('rateLimitBanner').classList.remove('show');
@@ -2889,14 +2998,21 @@ if(document.getElementById('loaderSub'))document.getElementById('loaderSub').tex
   } catch(err) {
     console.error('Analysis error:', err);
     document.getElementById('loadingState').classList.remove('show');
-    // Show fallback results even on error
-    const fallbackReport = buildFallback(null);
-    renderResults(fallbackReport, addr, null);
-    document.getElementById('results').classList.add('show');
+    // Distinguish a real network/RPC failure from a wallet that's genuinely empty
+    showAnalysisError(addr);
   } finally {
     document.getElementById('analyzeBtn').disabled=false;
     document.getElementById('analyzeBtn').textContent='Analyze →';
   }
+}
+
+function showAnalysisError(addr){
+  const banner = document.getElementById('rateLimitBanner');
+  if(banner){
+    banner.innerHTML = `⚠ Couldn't reach the blockchain right now. <a href="#" onclick="document.getElementById('walletInput').value='${esc(addr)}';runAnalysis();return false;" style="color:var(--accent);font-weight:600;">Retry analysis</a>`;
+    banner.classList.add('show');
+  }
+  document.getElementById('results').classList.remove('show');
 }
 
 async function generateAIReport(wallet,onChain){
