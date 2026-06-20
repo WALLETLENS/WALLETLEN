@@ -745,8 +745,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
                 </div>
                 <div class="overview-score-info">
                   <div class="overview-score-label">Intelligence Score <span class="tooltip-trigger" onclick="toggleTooltip('scoreMethodTooltip')" style="margin-left:2px;">?</span></div><div class="tooltip-box" id="scoreMethodTooltip">Score is calculated from 5 on-chain factors: transaction success rate (40pts), recent activity (25pts), tracker count (15pts), wallet age (15pts), SOL balance (5pts). Based on live Solana blockchain data via QuickNode RPC.</div>
-                  <div id="overviewVerdict" style="font-size:0.85rem;font-weight:600;margin-top:4px;">—</div>
-                  <div id="overviewVerdictSub" style="font-family:var(--mono);font-size:0.68rem;color:var(--muted);margin-top:4px;line-height:1.5;">—</div>
+                  <div id="overviewVerdictSub" style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin-top:6px;line-height:1.5;">—</div>
                 </div>
               </div>
             </div>
@@ -3202,8 +3201,6 @@ function renderResults(data,addr,onChain){
   if(data.noData){vp.style.color='#6b7280';vp.style.background='rgba(107,114,128,0.12)';vp.style.borderColor='rgba(107,114,128,0.25)';}
 
   // Overview verdict text
-  const ov=document.getElementById('overviewVerdict');
-  if(ov){ov.textContent=data.verdict;ov.style.color=data.scoreColor;}
   const ovs=document.getElementById('overviewVerdictSub');
   if(ovs)ovs.textContent=data.noData?'No on-chain transaction history found for this wallet.':data.score>=72?'High confidence copy candidate.':data.score>=52?'Watch this wallet — verify before copying.':'Low score — avoid copying right now.';
 
