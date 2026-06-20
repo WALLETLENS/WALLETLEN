@@ -334,6 +334,23 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 .icon-btn svg{width:13px;height:13px;}
 .icon-btn:hover{color:var(--accent);background:rgba(79,142,255,0.1);}
 .icon-btn.copied{color:var(--green);}
+.trader-tags-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.trader-tag{font-family:var(--mono);font-size:0.62rem;padding:2px 8px;border-radius:100px;border:1px solid;white-space:nowrap;}
+.watchlist-actions{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem;}
+.trades-header{display:flex;align-items:center;justify-content:space-between;}
+.view-toggle{display:flex;gap:2px;background:var(--bg4);border-radius:8px;padding:2px;}
+.view-toggle-btn{font-family:var(--mono);font-size:0.65rem;padding:4px 10px;border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.view-toggle-btn.active{background:var(--bg2);color:var(--text);}
+.trades-feed{display:flex;flex-direction:column;gap:6px;}
+.feed-item{display:flex;align-items:center;gap:10px;padding:0.7rem 0.875rem;background:var(--bg4);border-radius:10px;border:1px solid var(--border);}
+.feed-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;}
+.feed-icon.buy{background:rgba(79,142,255,0.12);color:var(--accent);}
+.feed-icon.sell{background:rgba(255,181,71,0.12);color:var(--amber);}
+.feed-main{flex:1;min-width:0;}
+.feed-title{font-size:0.8rem;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.feed-sub{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);margin-top:2px;}
+.feed-pnl{font-family:var(--mono);font-size:0.8rem;font-weight:600;flex-shrink:0;text-align:right;}
+.feed-flag{font-size:0.6rem;background:rgba(255,77,106,0.1);color:var(--red);border:1px solid rgba(255,77,106,0.2);padding:1px 6px;border-radius:4px;}
 .wallet-header-card{flex-direction:column;gap:0.875rem;padding:1rem;}
   .wallet-header-center{text-align:left;}
   .wallet-header-right{align-items:flex-start;flex-direction:row;flex-wrap:wrap;}
@@ -405,6 +422,23 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
 .icon-btn svg{width:13px;height:13px;}
 .icon-btn:hover{color:var(--accent);background:rgba(79,142,255,0.1);}
 .icon-btn.copied{color:var(--green);}
+.trader-tags-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.trader-tag{font-family:var(--mono);font-size:0.62rem;padding:2px 8px;border-radius:100px;border:1px solid;white-space:nowrap;}
+.watchlist-actions{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem;}
+.trades-header{display:flex;align-items:center;justify-content:space-between;}
+.view-toggle{display:flex;gap:2px;background:var(--bg4);border-radius:8px;padding:2px;}
+.view-toggle-btn{font-family:var(--mono);font-size:0.65rem;padding:4px 10px;border-radius:6px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.view-toggle-btn.active{background:var(--bg2);color:var(--text);}
+.trades-feed{display:flex;flex-direction:column;gap:6px;}
+.feed-item{display:flex;align-items:center;gap:10px;padding:0.7rem 0.875rem;background:var(--bg4);border-radius:10px;border:1px solid var(--border);}
+.feed-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;}
+.feed-icon.buy{background:rgba(79,142,255,0.12);color:var(--accent);}
+.feed-icon.sell{background:rgba(255,181,71,0.12);color:var(--amber);}
+.feed-main{flex:1;min-width:0;}
+.feed-title{font-size:0.8rem;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.feed-sub{font-family:var(--mono);font-size:0.65rem;color:var(--muted2);margin-top:2px;}
+.feed-pnl{font-family:var(--mono);font-size:0.8rem;font-weight:600;flex-shrink:0;text-align:right;}
+.feed-flag{font-size:0.6rem;background:rgba(255,77,106,0.1);color:var(--red);border:1px solid rgba(255,77,106,0.2);padding:1px 6px;border-radius:4px;}
 .wallet-header-card{background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
 .wallet-header-left{display:flex;align-items:center;gap:12px;}
 .wallet-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,0.1);}
@@ -700,6 +734,7 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                 </a>
               </div>
+              <div class="trader-tags-row" id="traderTagsRow" style="display:none;"></div>
             </div>
           </div>
           <div class="wallet-header-center">
@@ -902,8 +937,15 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
             <div style="font-family:var(--mono);font-size:0.68rem;color:var(--muted2);">View full history on <a href="#" id="tradesSolscanLink" target="_blank" style="color:var(--accent);">Solscan</a> or <a href="#" id="tradesGMGNLink" target="_blank" style="color:var(--accent);">GMGN</a></div>
           </div>
           <div class="trades-box" id="tradesBox">
-            <div class="trades-header"><div class="trades-title">Real Swap History</div></div>
-            <table class="trades-table">
+            <div class="trades-header">
+              <div class="trades-title">Real Swap History</div>
+              <div class="view-toggle">
+                <button class="view-toggle-btn active" id="viewToggleFeed" onclick="switchTradeView('feed')">Feed</button>
+                <button class="view-toggle-btn" id="viewToggleTable" onclick="switchTradeView('table')">Table</button>
+              </div>
+            </div>
+            <div class="trades-feed" id="tradesFeed"></div>
+            <table class="trades-table" id="tradesTable" style="display:none;">
               <thead>
                 <tr>
                   <th>Time</th><th>Type</th><th>Token</th><th>Amount</th><th>PnL</th><th>Status</th><th>Flag</th>
@@ -1044,6 +1086,10 @@ footer p{font-size:0.8rem;color:var(--muted2);font-family:var(--mono);margin-bot
   <h2 class="section-title fade-in" style="text-align:center;">Saved wallets.</h2>
   <p class="section-desc fade-in" style="text-align:center;margin:0 auto 2rem;">Wallets you've bookmarked for tracking. Stored locally in your browser.</p>
   <div class="metrics-grid fade-in" id="watchlistSummary" style="max-width:700px;margin:0 auto 2rem;"></div>
+  <div class="watchlist-actions fade-in" id="watchlistActions" style="display:none;">
+    <button class="btn-reset" onclick="exportWatchlistCSV()">⬇ Export CSV</button>
+    <button class="btn-reset" onclick="copyWatchlistShareLink()">🔗 Copy Share Link</button>
+  </div>
   <div class="hof-grid fade-in" id="watchlistGrid"></div>
 </section>
 
@@ -1442,6 +1488,7 @@ async function incrementLiveCounter() {
 
 fetchLiveCounter();
 renderWatchlist();
+loadSharedWatchlistFromURL();
 
 
 // WATCHLIST
@@ -1501,16 +1548,19 @@ function renderWatchlist() {
   const section = document.getElementById('watchlist');
   const divider = document.getElementById('watchlistDivider');
   const grid = document.getElementById('watchlistGrid');
+  const actions = document.getElementById('watchlistActions');
   if(!grid) return;
 
   if(list.length === 0) {
     if(section) section.style.display = 'none';
     if(divider) divider.style.display = 'none';
+    if(actions) actions.style.display = 'none';
     return;
   }
 
   if(section) section.style.display = 'block';
   if(divider) divider.style.display = 'block';
+  if(actions) actions.style.display = 'flex';
 
   // Portfolio summary stats across all saved wallets
   const summaryEl = document.getElementById('watchlistSummary');
@@ -2664,6 +2714,165 @@ Respond ONLY with valid JSON, no markdown:
   }
 }
 
+
+// TRADER TAGS — auto-classify wallets from real on-chain behavior (Cielo/GMGN-style)
+function getTraderTags(onChain) {
+  if(!onChain || !onChain.totalTxns) return [];
+  const tags = [];
+
+  // Activity-based
+  if(onChain.recentActivity >= 15) tags.push({label:'🔥 Very Active', color:'#ff4d6a'});
+  else if(onChain.recentActivity === 0) tags.push({label:'💤 Dormant', color:'#6b7280'});
+
+  // Balance-based (whale detection)
+  const bal = parseFloat(onChain.solBalance) || 0;
+  if(bal >= 100) tags.push({label:'🐋 Whale', color:'#627eea'});
+  else if(bal < 0.05 && onChain.totalTxns > 20) tags.push({label:'🪙 Low Balance', color:'#ffb547'});
+
+  // Win rate based
+  if(onChain.winRate >= 75) tags.push({label:'🎯 Sharp Shooter', color:'#00d68f'});
+  else if(onChain.winRate <= 35 && onChain.totalTxns > 10) tags.push({label:'⚠️ High Risk', color:'#ff4d6a'});
+
+  // Style based (already computed)
+  if(onChain.traderStyle === 'Sniper') tags.push({label:'⚡ Sniper', color:'#4f8eff'});
+  if(onChain.traderStyle === 'Holder') tags.push({label:'💎 Diamond Hands', color:'#a78bfa'});
+
+  // Age based
+  if(onChain.ageInDays !== undefined && onChain.ageInDays <= 3 && onChain.totalTxns > 15) tags.push({label:'🆕 New & Active', color:'#00c4de'});
+  else if(onChain.ageInDays >= 180) tags.push({label:'🏛️ Veteran', color:'#ffb547'});
+
+  // Copy pattern
+  if(onChain.isCopyTrader) tags.push({label:'🤖 Copy Trader', color:'#6b7280'});
+
+  // Volume / trade count based ("Gem Finder" style — high trade count, decent win rate)
+  if(onChain.totalTxns >= 80 && onChain.winRate >= 55) tags.push({label:'💠 Gem Finder', color:'#00d68f'});
+
+  return tags.slice(0, 4); // cap at 4 tags to keep UI clean
+}
+
+function renderTraderTags(onChain) {
+  const el = document.getElementById('traderTagsRow');
+  if(!el) return;
+  const tags = getTraderTags(onChain);
+  if(tags.length === 0) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'flex';
+  el.innerHTML = tags.map(t => `<span class="trader-tag" style="color:${t.color};border-color:${t.color}33;background:${t.color}14;">${t.label}</span>`).join('');
+}
+
+
+
+// CSV EXPORT — Cielo/GMGN-style data export for tax/tracking purposes
+function exportWatchlistCSV() {
+  const list = getWatchlist();
+  if(list.length === 0) return;
+
+  const headers = ['Address', 'Chain', 'Score', 'Verdict', 'Win Rate %', 'Trader Style', 'Saved At'];
+  const rows = list.map(w => [
+    w.addr,
+    w.chain,
+    w.score ?? '',
+    w.verdict ?? '',
+    w.winRate ?? '',
+    w.traderStyle ?? '',
+    w.savedAt ? new Date(w.savedAt).toISOString() : ''
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `walletlens-watchlist-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// SHAREABLE WATCHLIST — encode addresses into a URL anyone can open to view the same list
+function copyWatchlistShareLink() {
+  const list = getWatchlist();
+  if(list.length === 0) return;
+
+  // Encode as compact chain:address pairs, base64'd
+  const payload = list.map(w => `${w.chain}:${w.addr}`).join(',');
+  const encoded = btoa(encodeURIComponent(payload));
+  const shareUrl = `${window.location.origin}${window.location.pathname}?wl=${encoded}`;
+
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    const btns = document.querySelectorAll('#watchlistActions .btn-reset');
+    btns.forEach(b => {
+      if(b.textContent.includes('Share Link')) {
+        const original = b.textContent;
+        b.textContent = '✓ Link Copied!';
+        setTimeout(() => { b.textContent = original; }, 1800);
+      }
+    });
+  });
+}
+
+// Load a shared watchlist from URL param on page load (view-only import prompt)
+function loadSharedWatchlistFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const wl = params.get('wl');
+  if(!wl) return;
+
+  try {
+    const decoded = decodeURIComponent(atob(wl));
+    const pairs = decoded.split(',').filter(Boolean);
+    if(pairs.length === 0) return;
+
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--accent);border-radius:12px;padding:1rem 1.5rem;z-index:9999;font-family:var(--mono);font-size:0.8rem;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,0.4);max-width:90vw;text-align:center;';
+    banner.innerHTML = `Someone shared a watchlist with ${pairs.length} wallet${pairs.length>1?'s':''} with you. <button onclick="importSharedWatchlist('${esc(decoded)}');this.parentElement.remove();" style="background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:6px;margin-left:10px;cursor:pointer;font-family:var(--mono);font-size:0.75rem;">Import</button> <button onclick="this.parentElement.remove();" style="background:transparent;color:var(--muted);border:1px solid var(--border2);padding:6px 14px;border-radius:6px;margin-left:6px;cursor:pointer;font-family:var(--mono);font-size:0.75rem;">Dismiss</button>`;
+    document.body.appendChild(banner);
+  } catch(e) { /* malformed share link — ignore silently */ }
+}
+
+function importSharedWatchlist(decoded) {
+  const pairs = decoded.split(',').filter(Boolean);
+  let list = getWatchlist();
+  let added = 0;
+  pairs.forEach(pair => {
+    const [chain, addr] = pair.split(':');
+    if(!chain || !addr) return;
+    if(!list.some(w => w.addr.toLowerCase() === addr.toLowerCase() && w.chain === chain)) {
+      list.unshift({ addr, chain, score: null, verdict: 'Imported', winRate: null, traderStyle: null, savedAt: Date.now() });
+      added++;
+    }
+  });
+  list = list.slice(0, 20);
+  saveWatchlist(list);
+  renderWatchlist();
+  const wlSection = document.getElementById('watchlist');
+  if(wlSection) wlSection.scrollIntoView({behavior:'smooth'});
+}
+
+
+
+// TRADE VIEW TOGGLE — feed (Cielo-style) vs table
+function switchTradeView(mode) {
+  const feedEl = document.getElementById('tradesFeed');
+  const tableEl = document.getElementById('tradesTable');
+  const feedBtn = document.getElementById('viewToggleFeed');
+  const tableBtn = document.getElementById('viewToggleTable');
+  if(mode === 'feed') {
+    if(feedEl) feedEl.style.display = 'flex';
+    if(tableEl) tableEl.style.display = 'none';
+    if(feedBtn) feedBtn.classList.add('active');
+    if(tableBtn) tableBtn.classList.remove('active');
+  } else {
+    if(feedEl) feedEl.style.display = 'none';
+    if(tableEl) tableEl.style.display = 'table';
+    if(tableBtn) tableBtn.classList.add('active');
+    if(feedBtn) feedBtn.classList.remove('active');
+  }
+}
+
+
 function buildFallback(onChain){
   // NO DATA CASE: wallet has zero on-chain activity or RPC completely failed
   if(!onChain || !onChain.totalTxns || onChain.totalTxns === 0){
@@ -2805,6 +3014,9 @@ function renderResults(data,addr,onChain){
   if(copyIcon)copyIcon.style.display='inline-flex';
   if(explorerIcon){explorerIcon.style.display='inline-flex';explorerIcon.href=explorerUrlIcon;}
   if(gmgnIcon){gmgnIcon.style.display='inline-flex';gmgnIcon.href=gmgnUrlIcon;}
+
+  // Trader tags (auto-classified from real on-chain behavior)
+  renderTraderTags(data.noData ? null : onChain);
 
   // Balance
   const bal=onChain?.solBalance||'—';
@@ -2968,6 +3180,7 @@ function renderResults(data,addr,onChain){
   if(onChain&&onChain.trades&&onChain.trades.length>0){
     if(tradesEmpty) tradesEmpty.style.display='none';
     if(tradesBox) tradesBox.style.display='block';
+    switchTradeView('feed');
     // Update empty state links
     const ssLink = document.getElementById('tradesSolscanLink');
     const gmgnLink = document.getElementById('tradesGMGNLink');
@@ -2993,6 +3206,24 @@ function renderResults(data,addr,onChain){
         <td>${flag}</td>
       </tr>`;
     }).join('');
+
+    // Feed view (Cielo-style scannable cards)
+    const feedEl=document.getElementById('tradesFeed');
+    if(feedEl){
+      feedEl.innerHTML=onChain.trades.map(t=>{
+        const isRug=RUG_TOKENS.includes(t.token)&&t.pnlNum<0;
+        const isBuy=t.type==='BUY';
+        const pnlColor=t.pnlNum>0?'var(--green)':t.pnlNum<0?'var(--red)':'var(--muted2)';
+        return `<div class="feed-item">
+          <div class="feed-icon ${isBuy?'buy':'sell'}">${isBuy?'↓':'↑'}</div>
+          <div class="feed-main">
+            <div class="feed-title">${isBuy?'Bought':'Sold'} <strong>${esc(t.token)}</strong>${isRug?'<span class="feed-flag">RUG</span>':''}</div>
+            <div class="feed-sub">${t.amount} · ${t.time} · ${t.status}</div>
+          </div>
+          <div class="feed-pnl" style="color:${pnlColor};">${t.pnl}</div>
+        </div>`;
+      }).join('');
+    }
     const tp2=onChain.totalPnl;
     document.getElementById('totalPnl').textContent=(tp2>=0?'+$'+tp2.toFixed(0):'-$'+Math.abs(tp2).toFixed(0));
     document.getElementById('totalPnl').className='ts-val '+(tp2>=0?'c-green':'c-red');
